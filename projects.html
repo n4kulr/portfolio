@@ -5,10 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects — Nakul Rejeesh</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="theme.js"></script>
 </head>
 <body>
   <nav>
-    <span class="nav-name">nakul</span>
+    <div class="nav-brand">
+      <span class="nav-name">nakul</span>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" title="Dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 14.3A9 9 0 1 1 9.7 3a7 7 0 0 0 11.3 11.3z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+    </div>
     <ul>
       <li><a href="index.html">home</a></li>
       <li><a href="projects.html" class="active">projects</a></li>
@@ -18,52 +30,76 @@
 
   <main class="projects">
     <h2>projects</h2>
+    <p class="projects-sub">free time activities</p>
     <div class="project-grid">
 
       <div class="project-card-wrap">
-        <a class="project-card" href="https://github.com/n4kulr/linkedout" target="_blank" rel="noopener">
-          <div class="project-top">
-            <span class="project-name">LinkedOut</span>
-            <span class="project-year">2025</span>
+        <a class="project-card" href="https://github.com/n4kulr/guessify" target="_blank" rel="noopener">
+          <div class="project-thumb">
+            <img src="images/guessify.svg" alt="Guessify" />
           </div>
-          <p class="project-desc">A social network for failures — post your rejections, not your wins. Winner, UNSW Terrible Ideas Hackathon 2025.</p>
-          <div class="project-tags">
-            <span>React</span><span>Node.js</span><span>hackathon</span>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">Guessify</span>
+              <span class="project-year">2026</span>
+            </div>
+            <p class="project-desc">Music guessing game — hear a short snippet, name the song. Solo, party rooms and online multiplayer.</p>
+            <div class="project-tags">
+              <span>React</span><span>Vite</span><span>Cloudflare</span>
+            </div>
+          </div>
+        </a>
+        <a class="project-live" href="https://guessify.uk" target="_blank" rel="noopener">www.guessify.uk →</a>
+      </div>
+
+      <div class="project-card-wrap">
+        <a class="project-card" href="https://github.com/n4kulr/linkedout" target="_blank" rel="noopener">
+          <div class="project-thumb">
+            <img src="images/linkedout.svg" alt="LinkedOut" />
+          </div>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">LinkedOut</span>
+              <span class="project-year">2025</span>
+            </div>
+            <p class="project-desc">Social network for failures — post rejections. Winner, UNSW Terrible Ideas Hackathon 2025.</p>
+            <div class="project-tags">
+              <span>React</span><span>Node.js</span><span>hackathon</span>
+            </div>
           </div>
         </a>
         <a class="project-live" href="https://linkedout-iota.vercel.app/" target="_blank" rel="noopener">live demo →</a>
       </div>
 
       <a class="project-card" href="https://github.com/n4kulr/gitavadi" target="_blank" rel="noopener">
-        <div class="project-top">
-          <span class="project-name">Gitavadi</span>
-          <span class="project-year">2025</span>
+        <div class="project-thumb">
+          <img src="images/gitavadi.svg" alt="Gitavadi" />
         </div>
-        <p class="project-desc">iOS app for daily Git contributions. Tracks streaks and keeps you accountable.</p>
-        <div class="project-tags">
-          <span>Swift</span><span>iOS</span>
+        <div class="project-body">
+          <div class="project-top">
+            <span class="project-name">Gitavadi</span>
+            <span class="project-year">2025</span>
+          </div>
+          <p class="project-desc">Daily quotes from the Bhagavad Gita — index of all chapters and quotes.</p>
+          <div class="project-tags">
+            <span>Swift</span><span>iOS</span>
+          </div>
         </div>
       </a>
 
       <a class="project-card" href="https://github.com/n4kulr/screno" target="_blank" rel="noopener">
-        <div class="project-top">
-          <span class="project-name">Screno</span>
-          <span class="project-year">2025</span>
+        <div class="project-thumb">
+          <img src="images/screno.svg" alt="Screno" />
         </div>
-        <p class="project-desc">In progress. Stay tuned.</p>
-        <div class="project-tags">
-          <span>in progress</span>
-        </div>
-      </a>
-
-      <a class="project-card" href="https://github.com/n4kulr/portfolio" target="_blank" rel="noopener">
-        <div class="project-top">
-          <span class="project-name">this site</span>
-          <span class="project-year">2025</span>
-        </div>
-        <p class="project-desc">Personal portfolio. React, Vite, too much CSS.</p>
-        <div class="project-tags">
-          <span>React</span><span>Vite</span>
+        <div class="project-body">
+          <div class="project-top">
+            <span class="project-name">Screno</span>
+            <span class="project-year">2025</span>
+          </div>
+          <p class="project-desc">Screen time app — in progress.</p>
+          <div class="project-tags">
+            <span>Swift</span><span>iOS</span>
+          </div>
         </div>
       </a>
 
