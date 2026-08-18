@@ -303,6 +303,8 @@ main.games {
 
 .game-feature:hover { background: var(--card-hover); }
 
+.game-feature + .game-feature { margin-top: 24px; }
+
 .game-feature-info {
   padding: 32px 28px;
   display: flex;
