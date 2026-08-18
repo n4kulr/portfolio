@@ -119,6 +119,23 @@ main.games {
 }
 
 /* HOME */
+.intro {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.intro-mark {
+  width: 200px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .intro-mark {
+  filter: invert(1);
+  mix-blend-mode: screen;
+}
+
 .home h1 {
   font-family: var(--font);
   font-size: clamp(2.4rem, 6vw, 4rem);
@@ -371,4 +388,6 @@ main.games {
   nav ul { gap: 20px; }
   main { padding: 48px 24px; }
   .project-grid { grid-template-columns: 1fr; }
+  .intro { gap: 16px; }
+  .intro-mark { width: 120px; }
 }
