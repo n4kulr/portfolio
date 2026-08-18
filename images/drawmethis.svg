@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
   <rect width="640" height="400" fill="#f5f5f5"/>
-  <path d="M0 80h640M0 160h640M0 240h640M0 320h640
-           M80 0v400M160 0v400M240 0v400M320 0v400M400 0v400M480 0v400M560 0v400"
-        stroke="#111" stroke-width="1" opacity="0.16"/>
-  <path d="M320 0v400M0 200h640" stroke="#111" stroke-width="1.5" opacity="0.28"/>
+  <g transform="scale(-1,1) translate(-640,0)">
+    <path d="M-20 40l680 320M-20 0l680 320M-20 80l680 320M-20 120l680 320M-20 160l680 320M-20 200l680 320M-20 240l680 320M-20 280l680 320M-20 -40l680 320M-20 -80l680 320"
+          stroke="#111" stroke-width="1" opacity="0.16"/>
+  </g>
 </svg>

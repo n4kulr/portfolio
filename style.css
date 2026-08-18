@@ -31,6 +31,8 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   line-height: 1.6;
   transition: background 0.2s, color 0.2s;
 }
@@ -42,6 +44,15 @@ nav {
   justify-content: space-between;
   padding: 28px 48px;
   border-bottom: 1px solid var(--border);
+}
+
+body:has(main.home) nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background: var(--bg);
 }
 
 .nav-brand {
@@ -118,11 +129,21 @@ main.games {
   max-width: 920px;
 }
 
+main.home {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
 /* HOME */
 .intro {
   display: flex;
   align-items: center;
   gap: 28px;
+}
+
+.intro-copy {
+  min-width: 0;
 }
 
 .intro-mark {
@@ -388,6 +409,16 @@ main.games {
   nav ul { gap: 20px; }
   main { padding: 48px 24px; }
   .project-grid { grid-template-columns: 1fr; }
-  .intro { gap: 16px; }
-  .intro-mark { width: 120px; }
+  .project-thumb { aspect-ratio: 16 / 6; }
+  .intro {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 8px;
+  }
+  .intro-copy { display: contents; }
+  .intro-mark { width: 64px; }
+  .home h1 { font-size: 2rem; margin-bottom: 0; }
+  .tagline, .bio, .langs, .links { grid-column: 1 / -1; }
 }
