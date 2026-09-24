@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Projects — Nakul Rejeesh</title>
+  <title>Projects - Nakul Rejeesh</title>
   <link rel="stylesheet" href="style.css" />
   <script src="theme.js"></script>
 </head>
@@ -30,99 +30,274 @@
 
   <main class="projects">
     <h2>projects</h2>
-    <p class="projects-sub">free time activities</p>
+    <p class="projects-sub">click a project for what i built</p>
     <div class="project-grid">
 
       <div class="project-card-wrap">
-        <a class="project-card" href="https://github.com/n4kulr/guessify" target="_blank" rel="noopener">
+        <button type="button" class="project-card" aria-haspopup="dialog">
           <div class="project-thumb">
-            <img src="images/guessify.svg" alt="Guessify" />
+            <img src="images/guessify.svg" alt="" />
           </div>
           <div class="project-body">
             <div class="project-top">
               <span class="project-name">Guessify</span>
               <span class="project-year">2026</span>
             </div>
-            <p class="project-desc">Music guessing game — hear a short snippet, name the song. Solo, party rooms and online multiplayer.</p>
+            <p class="project-desc">Hear a few seconds of a song and name it before the timer runs out. Play solo, in a party room, or online against other people.</p>
             <div class="project-tags">
-              <span>React</span><span>Vite</span><span>Cloudflare</span>
+              <span>React</span><span>Vite</span><span>PartyKit</span><span>Cloudflare</span><span>REST APIs</span>
             </div>
           </div>
-        </a>
-        <a class="project-live" href="https://guessify.uk" target="_blank" rel="noopener">www.guessify.uk →</a>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Built the front end in React and Vite, deployed to Vercel</li>
+            <li>Spotify OAuth pulls your playlists; song previews come from iTunes and Deezer, with artist and track details from Last.fm shown alongside</li>
+            <li>Real-time party rooms built on PartyKit, so everyone's game stays in sync</li>
+            <li>Plus a solo mode for when there's no one else around</li>
+          </ul>
+        </div>
+        <div class="project-footer">
+          <a class="project-live" href="https://guessify.uk" target="_blank" rel="noopener">guessify.uk →</a>
+        </div>
       </div>
 
       <div class="project-card-wrap">
-        <a class="project-card" href="https://github.com/n4kulr/drawmethis" target="_blank" rel="noopener">
+        <button type="button" class="project-card" aria-haspopup="dialog">
           <div class="project-thumb">
-            <img src="images/drawmethis.svg" alt="drawmethis" />
+            <img src="images/nucleo.svg" alt="" />
           </div>
           <div class="project-body">
             <div class="project-top">
-              <span class="project-name">drawmethis</span>
+              <span class="project-name">Secure Gate</span>
               <span class="project-year">2026</span>
             </div>
-            <p class="project-desc">Drawing page — sketch, send and i get it on discord</p>
+            <p class="project-desc">[DESN2000] An access-control system on an STM32 Nucleo-F303RE — scan a card or type a code to open the gate, with an LCD, keypad, LEDs and a buzzer handling the feedback.</p>
             <div class="project-tags">
-              <span>React</span><span>Vite</span>
+              <span>C</span><span>STM32</span><span>ARM</span><span>SPI</span><span>I2C</span><span>UART</span><span>GPIO</span>
             </div>
           </div>
-        </a>
-        <a class="project-live" href="https://drawmethis.vercel.app/" target="_blank" rel="noopener">drawmethis.vercel.app →</a>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Written mostly in C on the F303RE's 72 MHz Cortex-M4, with about 10% hand-written in ARM assembly</li>
+            <li>My part of the build: the PN532 RFID/NFC reader, a shift-register LED bank, the buzzer and the switches</li>
+            <li>Got the card reader working by forking an existing PN532 driver and reading up on it enough to adapt it</li>
+            <li>Keypad and LCD for entering codes and showing status, wired up over GPIO, interrupts, timers, UART, SPI and I2C</li>
+          </ul>
+        </div>
+        <div class="project-footer"></div>
       </div>
 
       <div class="project-card-wrap">
-        <a class="project-card" href="https://github.com/n4kulr/linkedout" target="_blank" rel="noopener">
+        <button type="button" class="project-card" aria-haspopup="dialog">
           <div class="project-thumb">
-            <img src="images/linkedout.svg" alt="LinkedOut" />
+            <img src="images/linkedout.svg" alt="" />
           </div>
           <div class="project-body">
             <div class="project-top">
               <span class="project-name">LinkedOut</span>
               <span class="project-year">2025</span>
             </div>
-            <p class="project-desc">Social network for failures — post rejections. Winner, UNSW Terrible Ideas Hackathon 2025.</p>
+            <p class="project-desc">The opposite of LinkedIn — a social network for failures and rejections. Winner, UNSW Terrible Ideas Hackathon 2025.</p>
             <div class="project-tags">
-              <span>React</span><span>Node.js</span><span>hackathon</span>
+              <span>JavaScript</span><span>Node.js</span><span>Express</span><span>PostgreSQL</span><span>REST API</span>
             </div>
           </div>
-        </a>
-        <a class="project-live" href="https://linkedout-iota.vercel.app/" target="_blank" rel="noopener">live demo →</a>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Plain HTML, CSS and JavaScript on the front end — no framework, hackathon speed</li>
+            <li>Express and PostgreSQL behind it, holding the users and their posts</li>
+            <li>Auth with bcrypt-hashed passwords, and a small REST API for posting and reading the feed</li>
+            <li>Shipped on Vercel</li>
+          </ul>
+        </div>
+        <div class="project-footer">
+          <a class="project-live" href="https://linkedout-iota.vercel.app/" target="_blank" rel="noopener">live demo →</a>
+        </div>
       </div>
 
-      <a class="project-card" href="https://github.com/n4kulr/gitavadi" target="_blank" rel="noopener">
-        <div class="project-thumb">
-          <img src="images/gitavadi.svg" alt="Gitavadi" />
-        </div>
-        <div class="project-body">
-          <div class="project-top">
-            <span class="project-name">Gitavadi</span>
-            <span class="project-year">2025</span>
+      <div class="project-card-wrap">
+        <button type="button" class="project-card" aria-haspopup="dialog">
+          <div class="project-thumb">
+            <img src="images/itsquiz.svg" alt="" />
           </div>
-          <p class="project-desc">Daily quotes from the Bhagavad Gita — index of all chapters and quotes.</p>
-          <div class="project-tags">
-            <span>Swift</span><span>iOS</span>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">Toohak</span>
+              <span class="project-year">2025</span>
+            </div>
+            <p class="project-desc">[COMP1531] A full-stack quiz app in the shape of Kahoot — build a quiz, host a session, players join and answer.</p>
+            <div class="project-tags">
+              <span>TypeScript</span><span>JavaScript</span><span>GitLab</span><span>REST API</span><span>Full Stack</span>
+            </div>
           </div>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Built as a team in TypeScript and JavaScript, tracked on GitLab</li>
+            <li>A REST API for creating quizzes, hosting sessions and scoring answers</li>
+            <li>Login and persistent storage so quizzes and results stick around</li>
+            <li>Worked in iterations with code review and tests, the way COMP1531 runs</li>
+          </ul>
         </div>
-      </a>
+        <div class="project-footer"></div>
+      </div>
 
-      <a class="project-card" href="https://github.com/n4kulr/screno" target="_blank" rel="noopener">
-        <div class="project-thumb">
-          <img src="images/screno.svg" alt="Screno" />
-        </div>
-        <div class="project-body">
-          <div class="project-top">
-            <span class="project-name">Screno</span>
-            <span class="project-year">2025</span>
+      <div class="project-card-wrap">
+        <button type="button" class="project-card" aria-haspopup="dialog">
+          <div class="project-thumb">
+            <img src="images/gitavadi.svg" alt="" />
           </div>
-          <p class="project-desc">Screen time app — in progress.</p>
-          <div class="project-tags">
-            <span>Swift</span><span>iOS</span>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">Gitavadi</span>
+              <span class="project-year">2025</span>
+            </div>
+            <p class="project-desc">A native iOS reader for the Bhagavad Gita — move through all 18 chapters and 700 verses.</p>
+            <div class="project-tags">
+              <span>Swift</span><span>SwiftUI</span><span>iOS</span>
+            </div>
           </div>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Swift and SwiftUI — my first native mobile app</li>
+            <li>A clean reader for all 18 chapters and 700 verses, chapter by chapter</li>
+            <li>Built the interface using SwiftUI's declarative UI framework</li>
+          </ul>
         </div>
-      </a>
+        <div class="project-footer"></div>
+      </div>
+
+      <div class="project-card-wrap">
+        <button type="button" class="project-card" aria-haspopup="dialog">
+          <div class="project-thumb">
+            <img src="images/fire-rescue.svg" alt="" />
+          </div>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">Fire Rescue Robot</span>
+              <span class="project-year">2024</span>
+            </div>
+            <p class="project-desc">[DESN1000] A first-year Arduino robot that homes in on a target with light sensors and picks it up with a servo arm.</p>
+            <div class="project-tags">
+              <span>Arduino</span><span>C</span><span>Sensors</span><span>Servo Motors</span>
+            </div>
+          </div>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Arduino and C, one of my first hardware builds</li>
+            <li>Light sensors to find the target, servos to drive and to work the arm</li>
+            <li>Team effort on the wiring, the mechanical design, and getting the pickup to actually grab</li>
+          </ul>
+        </div>
+        <div class="project-footer"></div>
+      </div>
+
+      <div class="project-card-wrap">
+        <button type="button" class="project-card" aria-haspopup="dialog">
+          <div class="project-thumb">
+            <img src="images/drawmethis.svg" alt="" />
+          </div>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">drawmethis</span>
+              <span class="project-year">2026</span>
+            </div>
+            <p class="project-desc">A little drawing page — sketch something in the browser, hit send, and it lands in a Discord channel.</p>
+            <div class="project-tags">
+              <span>React</span><span>Vite</span><span>HTML Canvas</span><span>Webhooks</span><span>FormData</span>
+            </div>
+          </div>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Built a browser drawing board with React, Vite and HTML Canvas, then deployed it to Vercel</li>
+            <li>Freehand drawing with undo and redo, built on pointer events</li>
+            <li>Converts the finished canvas to an image and posts it to Discord through a webhook, sent as FormData</li>
+          </ul>
+        </div>
+        <div class="project-footer">
+          <a class="project-live" href="https://drawmethis.vercel.app/" target="_blank" rel="noopener">drawmethis.vercel.app →</a>
+        </div>
+      </div>
 
     </div>
   </main>
+
+  <dialog class="project-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
+    <form method="dialog">
+      <button type="submit" class="project-dialog-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </form>
+    <p class="project-dialog-kicker">what i built</p>
+    <h3 id="project-dialog-title"></h3>
+    <div class="project-tags" id="project-dialog-tags"></div>
+    <div class="project-dialog-body" id="project-dialog-body"></div>
+  </dialog>
+
+  <script>
+    (function () {
+      var dialog = document.getElementById("project-dialog");
+      var title = document.getElementById("project-dialog-title");
+      var tags = document.getElementById("project-dialog-tags");
+      var body = document.getElementById("project-dialog-body");
+      var scrollX = 0;
+      var scrollY = 0;
+      var pushed = false;
+      var fromPop = false;
+
+      function restoreScroll() {
+        window.scrollTo(scrollX, scrollY);
+      }
+
+      function openFrom(wrap) {
+        var card = wrap.querySelector(".project-card");
+        title.textContent = card.querySelector(".project-name").textContent;
+        tags.innerHTML = card.querySelector(".project-tags").innerHTML;
+        body.innerHTML = wrap.querySelector(".project-learn").innerHTML;
+        scrollX = window.scrollX;
+        scrollY = window.scrollY;
+        dialog.showModal();
+        history.pushState({ learnt: 1 }, "");
+        pushed = true;
+      }
+
+      document.querySelectorAll(".project-card-wrap").forEach(function (wrap) {
+        wrap.addEventListener("click", function (e) {
+          if (e.target.closest(".project-live")) return;
+          openFrom(wrap);
+        });
+      });
+
+      dialog.addEventListener("close", function () {
+        restoreScroll();
+        requestAnimationFrame(restoreScroll);
+        if (pushed && !fromPop) history.back();
+        pushed = false;
+        fromPop = false;
+      });
+
+      window.addEventListener("popstate", function () {
+        if (dialog.open) {
+          fromPop = true;
+          dialog.close();
+        }
+      });
+
+      dialog.addEventListener("click", function (e) {
+        var r = dialog.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+          dialog.close();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

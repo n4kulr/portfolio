@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <rect width="640" height="400" fill="#f5f5f5"/>
+  <path d="M80 40h480v320H80z" stroke="#111" stroke-width="1.25" opacity="0.22"/>
+  <path d="M80 80h40M80 120h40M80 160h40M80 200h40M80 240h40M80 280h40M80 320h40
+           M520 80h40M520 120h40M520 160h40M520 200h40M520 240h40M520 280h40M520 320h40"
+        stroke="#111" stroke-width="1.25" opacity="0.2"/>
+</svg>
