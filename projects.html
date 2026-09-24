@@ -265,6 +265,8 @@
         scrollX = window.scrollX;
         scrollY = window.scrollY;
         dialog.showModal();
+        restoreScroll();
+        requestAnimationFrame(restoreScroll);
         history.pushState({ learnt: 1 }, "");
         pushed = true;
       }

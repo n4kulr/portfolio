@@ -354,9 +354,13 @@ main.home {
 }
 
 .project-dialog {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: min(440px, calc(100% - 48px));
+  max-height: calc(100dvh - 48px);
   margin: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 36px 32px 32px;
   border: 1px solid var(--border);
   background: var(--bg);
@@ -536,6 +540,11 @@ main.home {
   main { padding: 48px 24px; }
   .project-grid { grid-template-columns: 1fr; }
   .project-thumb { aspect-ratio: 16 / 6; }
+  .project-dialog {
+    width: calc(100% - 32px);
+    max-height: calc(100dvh - 32px);
+    padding: 32px 24px 24px;
+  }
   .intro {
     display: grid;
     grid-template-columns: auto 1fr;
