@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <rect width="640" height="400" fill="#f5f5f5"/>
+  <path d="M0 110h640M0 290h640" stroke="#111" stroke-width="1.25" opacity="0.22"/>
+  <path d="M40 140h120v120H40zM200 140h120v120H200zM360 140h120v120H360zM520 140h120v120H520z"
+        stroke="#111" stroke-width="1.25" opacity="0.2"/>
+  <path d="M20 80h16M60 80h16M100 80h16M140 80h16M180 80h16M220 80h16M260 80h16M300 80h16M340 80h16M380 80h16M420 80h16M460 80h16M500 80h16M540 80h16M580 80h16M620 80h16
+           M20 320h16M60 320h16M100 320h16M140 320h16M180 320h16M220 320h16M260 320h16M300 320h16M340 320h16M380 320h16M420 320h16M460 320h16M500 320h16M540 320h16M580 320h16M620 320h16"
+        stroke="#111" stroke-width="6" opacity="0.14"/>
+</svg>

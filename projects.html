@@ -225,6 +225,64 @@
         </div>
       </div>
 
+      <div class="project-card-wrap">
+        <button type="button" class="project-card" aria-haspopup="dialog">
+          <div class="project-thumb">
+            <img src="images/hitthatbeat.svg" alt="" />
+          </div>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">hitthatbeat</span>
+              <span class="project-year">2026</span>
+            </div>
+            <p class="project-desc">A four-lane rhythm game in the browser — drop in any song and it builds easy, normal, hard and expert charts from the audio.</p>
+            <div class="project-tags">
+              <span>TypeScript</span><span>Vite</span><span>Web Audio</span><span>Web Workers</span><span>IndexedDB</span>
+            </div>
+          </div>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>Plain TypeScript and Vite, no framework, rendering the lanes and notes on a canvas</li>
+            <li>Analyses the song in a Web Worker, picking out hits per frequency band (kick, snare, hats) plus melody changes, then weighs drums against melody for each difficulty</li>
+            <li>Compensates for display lag and measures your timing offset, so notes line up with what you hear</li>
+            <li>Audio never leaves your device; songs and scores are saved locally, with rebindable keys and touch support</li>
+          </ul>
+        </div>
+        <div class="project-footer">
+          <a class="project-live" href="https://hitthatbeat.vercel.app" target="_blank" rel="noopener">hitthatbeat.vercel.app →</a>
+        </div>
+      </div>
+
+      <div class="project-card-wrap">
+        <button type="button" class="project-card" aria-haspopup="dialog">
+          <div class="project-thumb">
+            <img src="images/fotos.svg" alt="" />
+          </div>
+          <div class="project-body">
+            <div class="project-top">
+              <span class="project-name">fotos</span>
+              <span class="project-year">2026</span>
+            </div>
+            <p class="project-desc">A private photo and video gallery that installs like an app, hidden behind a passcode lock screen.</p>
+            <div class="project-tags">
+              <span>JavaScript</span><span>Cloudflare Workers</span><span>R2</span><span>Node.js</span><span>PWA</span>
+            </div>
+          </div>
+        </button>
+        <div class="project-learn" hidden>
+          <ul>
+            <li>A Cloudflare Worker serves the media out of an R2 bucket, with range requests so videos stream and seek</li>
+            <li>Passcode login with sessions, plus a fallback for browsers that block cross-site cookies</li>
+            <li>Node scripts using sharp to generate thumbnails and upload new photos to R2</li>
+            <li>A filmstrip you can drag or scrub with the mouse wheel, installable to the home screen as a PWA</li>
+          </ul>
+        </div>
+        <div class="project-footer">
+          <a class="project-live" href="https://manjumedia.vercel.app" target="_blank" rel="noopener">manjumedia.vercel.app →</a>
+        </div>
+      </div>
+
     </div>
   </main>
 
