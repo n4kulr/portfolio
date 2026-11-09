@@ -266,8 +266,8 @@ main.home {
   display: block;
 }
 
-[data-theme="dark"] .project-thumb img,
-[data-theme="dark"] .game-thumb img {
+[data-theme="dark"] .project-thumb img[src$=".svg"],
+[data-theme="dark"] .game-thumb img[src$=".svg"] {
   filter: invert(1);
 }
 
