@@ -125,7 +125,7 @@ main {
   padding: 80px 48px;
 }
 
-main.games {
+main.projects {
   max-width: 920px;
 }
 
@@ -203,8 +203,7 @@ main.home {
 .links a:hover { opacity: 0.5; }
 
 /* PROJECTS */
-.projects h2,
-.games h2 {
+.projects h2 {
   font-family: var(--font);
   font-size: 2rem;
   font-weight: normal;
@@ -212,8 +211,7 @@ main.home {
   margin-bottom: 40px;
 }
 
-.projects-sub,
-.games-sub {
+.projects-sub {
   font-size: 16px;
   color: var(--text-dim);
   margin-top: -28px;
@@ -457,7 +455,7 @@ main.home {
   }
 }
 
-/* GAMES */
+/* FEATURED */
 .game-feature {
   display: grid;
   grid-template-columns: minmax(180px, 0.9fr) minmax(0, 1.4fr);
@@ -472,6 +470,8 @@ main.home {
 .game-feature:hover { background: var(--card-hover); }
 
 .game-feature + .game-feature { margin-top: 24px; }
+
+.game-feature + .project-grid { margin-top: 48px; }
 
 .game-feature-info {
   padding: 32px 28px;

@@ -24,43 +24,57 @@
     <ul>
       <li><a href="index.html">home</a></li>
       <li><a href="projects.html" class="active">projects</a></li>
-      <li><a href="games.html">games</a></li>
     </ul>
   </nav>
 
   <main class="projects">
     <h2>projects</h2>
     <p class="projects-sub">click a project for what i built</p>
-    <div class="project-grid">
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/guessify.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">Guessify</span>
-              <span class="project-year">2026</span>
-            </div>
-            <p class="project-desc">Hear a few seconds of a song and name it before the timer runs out. Play solo, in a party room, or online against other people.</p>
-            <div class="project-tags">
-              <span>React</span><span>Vite</span><span>PartyKit</span><span>Cloudflare</span><span>REST APIs</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Built the front end in React and Vite, deployed to Vercel</li>
-            <li>Spotify OAuth pulls your playlists; song previews come from iTunes and Deezer, with artist and track details from Last.fm shown alongside</li>
-            <li>Real-time party rooms built on PartyKit, so everyone's game stays in sync</li>
-            <li>Plus a solo mode for when there's no one else around</li>
-          </ul>
-        </div>
-        <div class="project-footer">
-          <a class="project-live" href="https://guessify.uk" target="_blank" rel="noopener">guessify.uk →</a>
-        </div>
+    <a class="game-feature" href="https://guessify.uk" target="_blank" rel="noopener">
+      <div class="game-feature-info">
+        <span class="game-name">Guessify</span>
+        <p>Hear a few seconds of a song, name it before the timer runs out. Play solo, in a party room, or online against other people.</p>
+        <span class="game-feature-link">guessify.uk →</span>
       </div>
+      <div class="game-feature-media">
+        <img src="images/guessify-demo.png" alt="Guessify gameplay preview" />
+      </div>
+    </a>
+
+    <a class="game-feature" href="https://drawmethis.vercel.app/" target="_blank" rel="noopener">
+      <div class="game-feature-info">
+        <span class="game-name">drawmethis</span>
+        <p>Sketch something in the browser, hit send, and it drops straight into a Discord channel.</p>
+        <span class="game-feature-link">drawmethis.vercel.app →</span>
+      </div>
+      <div class="game-feature-media">
+        <img src="images/drawmethis-demo.jpg" alt="drawmethis drawing page" />
+      </div>
+    </a>
+
+    <a class="game-feature" href="https://hitthatbeat.vercel.app" target="_blank" rel="noopener">
+      <div class="game-feature-info">
+        <span class="game-name">hitthatbeat</span>
+        <p>Drop in any song and play it as a four-lane rhythm game, with charts from easy to expert built straight from the audio.</p>
+        <span class="game-feature-link">hitthatbeat.vercel.app →</span>
+      </div>
+      <div class="game-feature-media">
+        <img src="images/hitthatbeat-demo.jpg" alt="hitthatbeat home screen with the four note lanes" />
+      </div>
+    </a>
+
+    <a class="game-feature" href="https://outliner-vert.vercel.app" target="_blank" rel="noopener">
+      <div class="game-feature-info">
+        <span class="game-name">Outliner</span>
+        <p>Drop in your UNSW course outlines and every assessment lands on one calendar, with week numbers worked out and an export to Google, Apple or Outlook.</p>
+        <span class="game-feature-link">outliner-vert.vercel.app →</span>
+      </div>
+      <div class="game-feature-media">
+        <img src="images/outliner-demo.jpg" alt="Outliner month calendar with the course outline drop panel" />
+      </div>
+    </a>
+
+    <div class="project-grid">
 
       <div class="project-card-wrap">
         <button type="button" class="project-card" aria-haspopup="dialog">
@@ -195,63 +209,6 @@
           </ul>
         </div>
         <div class="project-footer"></div>
-      </div>
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/drawmethis.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">drawmethis</span>
-              <span class="project-year">2026</span>
-            </div>
-            <p class="project-desc">A little drawing page — sketch something in the browser, hit send, and it lands in a Discord channel.</p>
-            <div class="project-tags">
-              <span>React</span><span>Vite</span><span>HTML Canvas</span><span>Webhooks</span><span>FormData</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Built a browser drawing board with React, Vite and HTML Canvas, then deployed it to Vercel</li>
-            <li>Freehand drawing with undo and redo, built on pointer events</li>
-            <li>Converts the finished canvas to an image and posts it to Discord through a webhook, sent as FormData</li>
-          </ul>
-        </div>
-        <div class="project-footer">
-          <a class="project-live" href="https://drawmethis.vercel.app/" target="_blank" rel="noopener">drawmethis.vercel.app →</a>
-        </div>
-      </div>
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/hitthatbeat.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">hitthatbeat</span>
-              <span class="project-year">2026</span>
-            </div>
-            <p class="project-desc">A four-lane rhythm game in the browser — drop in any song and it builds easy, normal, hard and expert charts from the audio.</p>
-            <div class="project-tags">
-              <span>TypeScript</span><span>Vite</span><span>Web Audio</span><span>Web Workers</span><span>IndexedDB</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Plain TypeScript and Vite, no framework, rendering the lanes and notes on a canvas</li>
-            <li>Analyses the song in a Web Worker, picking out hits per frequency band (kick, snare, hats) plus melody changes, then weighs drums against melody for each difficulty</li>
-            <li>Compensates for display lag and measures your timing offset, so notes line up with what you hear</li>
-            <li>Audio never leaves your device; songs and scores are saved locally, with rebindable keys and touch support</li>
-          </ul>
-        </div>
-        <div class="project-footer">
-          <a class="project-live" href="https://hitthatbeat.vercel.app" target="_blank" rel="noopener">hitthatbeat.vercel.app →</a>
-        </div>
       </div>
 
       <div class="project-card-wrap">
