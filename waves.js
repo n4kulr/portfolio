@@ -1,6 +1,6 @@
 // ASCII ocean footer for the home page, drawn in a dense ink ramp (" .:*IVFN") like old ASCII art prints.
-// The front swell is a 1D fluid surface: move the mouse or drag a finger through it to push the water
-// around and send waves travelling; click or tap to splash. It also exposes window.ocean so the GitHub
+// The front swell is a 1D fluid surface: move the mouse through it to push the water around, press and
+// drag (or drag a finger) to pull the water up with you, and click or tap to splash. It also exposes window.ocean so the GitHub
 // graph (contrib.js) can read the water line and call up swells that reach into it.
 (function () {
   var sea = document.getElementById("ocean");
@@ -58,7 +58,7 @@
         v[i] += (140 * (l + r - 2 * h[i]) - 4 * h[i]) * d;
         v[i] *= 0.99;
       }
-      for (i = 0; i < n; i++) h[i] = Math.max(-34, Math.min(9, h[i] + v[i] * d));
+      for (i = 0; i < n; i++) h[i] = Math.max(-40, Math.min(16, h[i] + v[i] * d));
       // a touch of smoothing keeps neighbouring columns from tearing apart
       for (i = 1; i < n - 1; i++) h[i] += (h[i - 1] + h[i + 1] - 2 * h[i]) * 0.08;
     }
@@ -127,19 +127,19 @@
     for (var r = 0; r < ROWS; r++) {
       var line = "";
       for (var x = 0; x < cols; x++) {
+        // stay quiet at the top: the sky stipple fades out completely, the water only a little
+        var u = r / (REF_ROWS * 0.92);
+        var fade = u >= 1 ? 1 : u * u * (3 - 2 * u);
+        var sky = Math.max(0, Math.min(1, (r - 2) / 27));
         // sky: a fine stipple of : and .
-        var ink = 0.3 + (hash(x, r) - 0.5) * 0.1;
+        var ink = (0.3 + (hash(x, r) - 0.5) * 0.1) * sky * sky * (3 - 2 * sky);
         for (var li = 0; li < LAYERS.length; li++) {
           var s = surf[li][x + 1], d = r - s;
           if (d <= -1) continue;
           var cov = Math.min(1, 1 + d);
-          ink = ink * (1 - cov) + shade(LAYERS[li], x, r, s, surf[li][x + 2] - surf[li][x]) * cov;
+          ink = ink * (1 - cov) + shade(LAYERS[li], x, r, s, surf[li][x + 2] - surf[li][x]) * cov * Math.max(0.75, fade);
         }
         ink = Math.max(0, Math.min(0.999, ink));
-        // stay quiet at the top and only reach full ink near the bottom
-        var u = r / (REF_ROWS * 0.92);
-        var fade = u >= 1 ? 1 : u * u * (3 - 2 * u);
-        ink *= fade;
         line += RAMP[Math.floor(ink * RAMP.length)];
       }
       lines.push(line);
@@ -147,7 +147,6 @@
     spray.forEach(function (p) {
       var px = Math.round(p.x), py = Math.round(p.y);
       if (px < 0 || px >= cols || py < 0 || py >= ROWS) return;
-      if (py / (REF_ROWS * 0.92) < 0.28) return;
       lines[py] = lines[py].slice(0, px) + (p.vy < 0 ? "'" : ".") + lines[py].slice(px + 1);
     });
     screen.textContent = lines.join("\n");
@@ -161,6 +160,16 @@
       push(w.x, -1100 * dt, 5);
       return true;
     });
+    // pressing and dragging pulls the water at the pointer towards it, like scooping it up
+    if (grab && grab.c) {
+      var R = 7;
+      for (var j = Math.max(0, Math.floor(grab.c.x - R * 2)); j <= Math.min(cols - 1, Math.ceil(grab.c.x + R * 2)); j++) {
+        var g = Math.exp(-((j - grab.c.x) * (j - grab.c.x)) / (2 * R * R));
+        var want = Math.max(1, grab.c.y) - surface(FRONT, j);
+        v[j] += want * 160 * g * dt;
+        v[j] *= 1 - 0.12 * g;
+      }
+    }
     stepSim(dt);
     // fast-rising water throws off spray
     for (var i = 1; i < cols - 1; i += 2) {
@@ -189,24 +198,44 @@
       var dx = c.x - lastPt.x, dy = c.y - lastPt.y;
       var s = surface(FRONT, c.x);
       // only water near or under the pointer reacts: like dragging a hand through it
-      if (c.y > s - 3) {
-        var depth = Math.min(1, Math.max(0.35, (c.y - s + 3) / 8));
-        push(c.x, Math.max(-40, Math.min(40, dy * 10 + Math.abs(dx) * 2.2)) * depth, 3.5);
-        push(c.x + Math.sign(dx) * 5, -Math.min(30, Math.abs(dx) * 1.6) * depth, 4); // bow wave ahead of the motion
-        if (Math.abs(dx) > 1.5 && Math.random() < 0.35) splash(c.x, s - 1, 2, 9);
+      if (c.y > s - 8) {
+        var depth = Math.min(1, Math.max(0.5, (c.y - s + 8) / 10));
+        push(c.x, Math.max(-110, Math.min(110, dy * 26 + Math.abs(dx) * 7)) * depth, 4.5);
+        push(c.x + Math.sign(dx) * 6, -Math.min(90, Math.abs(dx) * 5) * depth, 5); // bow wave ahead of the motion
+        if (Math.abs(dx) > 0.8 && Math.random() < 0.7) splash(c.x, s - 1, 3 + Math.round(Math.abs(dx)), 14);
       }
     }
     lastPt = { id: e.pointerId, x: c.x, y: c.y };
   });
-  sea.addEventListener("pointerleave", function () { lastPt = null; });
-  sea.addEventListener("pointerup", function (e) { if (e.pointerType !== "mouse") lastPt = null; });
+  sea.addEventListener("pointerleave", function () { if (!grab) lastPt = null; });
 
-  sea.addEventListener("click", function (e) {
-    if (reduce) return;
+  var grab = null;
+  sea.addEventListener("pointerdown", function (e) {
+    if (reduce || (e.pointerType === "mouse" && e.button !== 0)) return;
     var c = cell(e);
-    push(c.x, 45, 3.5);
-    splash(c.x, surface(FRONT, c.x) - 1, 36, 22);
+    grab = { id: e.pointerId, c: c, x0: e.clientX, y0: e.clientY, moved: false };
+    sea.setPointerCapture(e.pointerId);
+    e.preventDefault();
   });
+  sea.addEventListener("pointermove", function (e) {
+    if (!grab || grab.id !== e.pointerId) return;
+    grab.c = cell(e);
+    if (Math.hypot(e.clientX - grab.x0, e.clientY - grab.y0) > 6) grab.moved = true;
+  });
+  function release(e) {
+    if (!grab || grab.id !== e.pointerId) return;
+    var c = grab.c, moved = grab.moved;
+    grab = null;
+    if (e.pointerType !== "mouse") lastPt = null;
+    if (moved) {
+      splash(c.x, surface(FRONT, c.x) - 1, 24, 20); // let go: it crashes back down
+    } else if (e.type === "pointerup") {
+      push(c.x, 80, 4.5);                          // a plain click or tap splashes
+      splash(c.x, surface(FRONT, c.x) - 1, 60, 26);
+    }
+  }
+  sea.addEventListener("pointerup", release);
+  sea.addEventListener("pointercancel", release);
 
   // ---------- for the GitHub graph ----------
   window.ocean = {

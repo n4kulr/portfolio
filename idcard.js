@@ -1,6 +1,6 @@
 // 3D ID card on the home page. The model (models/idcard.glb) was built in Blender (models/portfolio.blend);
 // both faces are drawn here on canvases, with the animated portrait gif in the photo box.
-// Desktop: the card follows the mouse. Phones: it follows the gyroscope. Click or tap to flip it.
+// It reacts to a nearby mouse, can be dragged around on its lanyard, and flips on a click or tap.
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
@@ -384,7 +384,7 @@ async function start() {
   const G = 9800 * 0.6;                       // gravity, world units / s^2
   const gravity = new THREE.Vector3(0, -G, 0);
   const cur = { x: 0, y: 0 }, vel = { x: 0, y: 0 }, target = { x: 0, y: 0 };
-  let flip = 0, gyro = null, lastMouse = null, drag = null, dragged = false;
+  let flip = 0, lastMouse = null, drag = null, dragged = false;
   let worldPerPx = 0.3;
   const grabTarget = new THREE.Vector3();
 
@@ -417,19 +417,6 @@ async function start() {
     }
     lastMouse = { x: e.clientX, y: e.clientY };
   });
-
-  // phones: tilting the phone tilts gravity, so the card keeps hanging "down"
-  function onTilt(e) {
-    if (e.beta == null || e.gamma == null) return;
-    if (!gyro) gyro = { beta: e.beta };
-    const g = THREE.MathUtils.degToRad(Math.max(-60, Math.min(60, e.gamma)));
-    gravity.set(Math.sin(g) * G, -Math.cos(g) * G, 0);
-    target.y = Math.max(-1, Math.min(1, e.gamma / 35)) * 0.5;
-    target.x = Math.max(-1, Math.min(1, (e.beta - gyro.beta) / 35)) * 0.35;
-  }
-  const needsPermission = typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
-  if (!needsPermission) window.addEventListener("deviceorientation", onTilt);
-  let askedTilt = !needsPermission;
 
   // drag the card: it pulls on the lanyard, swings when you let go, and spins with sideways throws
   function pointerWorld(e) {
@@ -536,18 +523,9 @@ async function start() {
     lightbox.showModal();
   }
 
-  host.addEventListener("click", async (e) => {
+  host.addEventListener("click", (e) => {
     if (dragged) { dragged = false; return; }
     if (overPhoto(e)) { openPhoto(); return; }
-    if (!askedTilt) {
-      askedTilt = true;
-      try {
-        if ((await DeviceOrientationEvent.requestPermission()) === "granted") {
-          window.addEventListener("deviceorientation", onTilt);
-          return;
-        }
-      } catch { /* fall through to a flip */ }
-    }
     flip += Math.PI;
     nudge(1.2, 0);
   });

@@ -627,9 +627,7 @@ body:has(main.home) { overflow-x: clip; }
   cursor: crosshair;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-y;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 14px, #000 230px);
-  mask-image: linear-gradient(to bottom, transparent 0, transparent 14px, #000 230px);
+  touch-action: none; /* dragging on the sea grabs the water rather than scrolling */
   z-index: 0;
 }
 
