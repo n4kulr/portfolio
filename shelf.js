@@ -245,7 +245,12 @@
     if (fromUser) {
       history.replaceState(null, "", "#" + CDS[i].id);
       var r = buttons[i].getBoundingClientRect(), rr = row.getBoundingClientRect();
-      if (r.left < rr.left || r.right > rr.right) buttons[i].scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+      if (r.left < rr.left || r.right > rr.right) row.scrollTo({ left: row.scrollLeft + (r.left + r.width / 2) - (rr.left + rr.width / 2), behavior: "smooth" });
+      // phone: glide down to the project, unless its top is already on screen
+      if (!wide.matches) {
+        var top = detail.getBoundingClientRect().top;
+        if (top < 0 || top > window.innerHeight * 0.6) detail.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
     }
   }
 
