@@ -1,7 +1,11 @@
-// GitHub contribution graph for the projects page, from a public API that mirrors github.com/<user>'s calendar.
+// GitHub contribution graph. On the projects page at desktop widths, and under the home-page
+// links on a phone. A public API mirrors github.com/<user>'s calendar.
 (function () {
   var root = document.getElementById("contrib");
   if (!root) return;
+  var phone = window.matchMedia("(max-width: 600px)").matches;
+  if (root.classList.contains("home-contrib") && !phone) return;
+  if (!root.classList.contains("home-contrib") && phone) return;
   var user = root.dataset.user;
   var grid = root.querySelector(".contrib-grid");
   var months = root.querySelector(".contrib-months");
@@ -22,11 +26,6 @@
   blank();
 
   function parse(d) { var p = d.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
-  function label(day) {
-    var dt = parse(day.date);
-    var n = day.count === 0 ? "No contributions" : day.count + (day.count === 1 ? " contribution" : " contributions");
-    return n + " on " + MONTHS[dt.getMonth()] + " " + dt.getDate() + ", " + dt.getFullYear();
-  }
 
   fetch("https://github-contributions-api.jogruber.de/v4/" + encodeURIComponent(user) + "?y=last")
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -49,12 +48,8 @@
       cells.forEach(function (day) {
         var c = document.createElement("span");
         c.className = "contrib-cell";
-        if (day) {
-          c.dataset.level = day.level;
-          c.title = label(day);
-        } else {
-          c.style.visibility = "hidden";
-        }
+        if (day) c.dataset.level = day.level;
+        else c.style.visibility = "hidden";
         frag.appendChild(c);
       });
       grid.appendChild(frag);
@@ -77,10 +72,10 @@
 
       var n = data.total && (data.total.lastYear != null ? data.total.lastYear : null);
       if (n == null) n = days.reduce(function (a, d) { return a + d.count; }, 0);
-      total.textContent = n.toLocaleString() + " contributions in the last year";
+      if (total) total.textContent = n.toLocaleString() + " contributions in the last year";
       if (scroller.scrollWidth > scroller.clientWidth + 4) scroller.scrollLeft = scroller.scrollWidth;
     })
     .catch(function () {
-      total.textContent = "couldn't load contributions right now";
+      if (total) total.textContent = "couldn't load contributions right now";
     });
 })();
