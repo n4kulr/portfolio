@@ -636,7 +636,7 @@ body:has(main.home) { overflow-x: clip; }
 
 /* desktop: the sea tucks up under the bottom of the hero so its swells can reach the graph */
 @media (min-width: 601px) {
-  .ocean { margin-top: -96px; }
+  .ocean { margin-top: -40px; }
 }
 
 .ocean pre { position: absolute; top: 0; left: 0; }
