@@ -5,7 +5,9 @@
   var root = document.getElementById("contrib");
   if (!root) return;
   var user = root.dataset.user;
-  var grid = root.querySelector(".contrib-grid");
+  var grid = root.querySelector(".contrib-grid:not(.contrib-ghost)");
+  var ghost = root.querySelector(".contrib-ghost"); // empty rows under the graph that fade away
+  var GHOST_ROWS = 6;
   var months = root.querySelector(".contrib-months");
   var total = root.querySelector(".contrib-total");
   var scroller = root.querySelector(".contrib-scroll");
@@ -29,6 +31,19 @@
       if (day !== null) cells.push({ el: c, x: 0, bottom: 0, wet: 0 });
     });
     grid.appendChild(frag);
+
+    if (ghost) {
+      ghost.textContent = "";
+      var g = document.createDocumentFragment();
+      var n = Math.ceil(list.length / 7) * GHOST_ROWS;
+      for (var i = 0; i < n; i++) {
+        var e = document.createElement("span");
+        e.className = "contrib-cell";
+        g.appendChild(e);
+        cells.push({ el: e, x: 0, bottom: 0, wet: 0 });
+      }
+      ghost.appendChild(g);
+    }
   }
 
   function labels() {
@@ -55,6 +70,7 @@
 
   function layout() {
     grid.style.setProperty("--weeks", weeks);
+    if (ghost) ghost.style.setProperty("--weeks", weeks);
     months.style.setProperty("--weeks", weeks);
     labels();
     measure();
