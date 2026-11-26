@@ -130,7 +130,8 @@ main.projects {
 }
 
 main.home {
-  min-height: 100vh;
+  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
 }
@@ -518,6 +519,82 @@ main.home {
 
 .coming-soon { opacity: 0.4; }
 
+/* ID CARD */
+.id-card {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.id-card.is-3d {
+  width: 260px;
+  height: 400px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* full-width layer behind the hero text that the card is drawn on */
+main.home { position: relative; }
+body:has(main.home) { overflow-x: clip; }
+.intro { position: relative; z-index: 1; }
+
+.id-card-stage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.id-card-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* the gif stays in the page as the texture source, just out of sight */
+.id-card.is-3d .intro-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0.01;
+  pointer-events: none;
+}
+
+.id-card-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* OCEAN */
+.ocean {
+  width: 100%;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.ocean pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 8px;
+  line-height: 8px;
+  letter-spacing: 0;
+  color: var(--text-dim);
+  white-space: pre;
+}
+
 /* RESPONSIVE */
 @media (max-width: 700px) {
   .game-feature {
@@ -556,4 +633,8 @@ main.home {
   .intro-mark { width: 64px; }
   .home h1 { font-size: 2rem; margin-bottom: 0; }
   .tagline, .bio, .langs, .links { grid-column: 1 / -1; }
+  .intro.has-card { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+  .intro.has-card .intro-copy { display: block; }
+  .intro.has-card .id-card { align-self: center; width: 230px; height: 350px; }
+  .intro.has-card h1 { margin-bottom: 16px; }
 }

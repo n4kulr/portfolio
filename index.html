@@ -29,7 +29,10 @@
 
   <main class="home">
     <section class="intro">
-      <img class="intro-mark" src="images/portrait.gif" alt="" />
+      <div class="id-card" id="id-card" role="img" aria-label="ID card for Nakul Rejeesh">
+        <img class="intro-mark" src="images/portrait.gif" alt="" />
+        <p class="id-card-hint" id="id-card-hint" aria-hidden="true"></p>
+      </div>
       <div class="intro-copy">
       <h1>Nakul Rejeesh</h1>
       <p class="tagline">Computer Engineering @ UNSW</p>
@@ -43,5 +46,19 @@
       </div>
     </section>
   </main>
+
+  <footer class="ocean" id="ocean" aria-hidden="true">
+    <pre></pre>
+  </footer>
+  <script src="waves.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="idcard.js"></script>
 </body>
 </html>
