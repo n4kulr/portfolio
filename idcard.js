@@ -526,8 +526,13 @@ async function start() {
       lightbox.addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") settle(); });
       // only a click on the blurred background closes it
       lightbox.addEventListener("click", (e) => { if (!fig.contains(e.target)) lightbox.close(); });
-      lightbox.addEventListener("close", settle);
+      lightbox.addEventListener("close", () => {
+        settle();
+        document.documentElement.classList.remove("photo-open");
+      });
     }
+    // everything behind the blur stays still while the photo is open (moving content made the blur flicker)
+    document.documentElement.classList.add("photo-open");
     lightbox.showModal();
   }
 
@@ -656,7 +661,7 @@ async function start() {
   renderer.setAnimationLoop((now) => {
     const dt = (now - lastNow) / 1000;
     lastNow = now;
-    if (!visible) return;
+    if (!visible || document.documentElement.classList.contains("photo-open")) return;
 
     // portrait animation
     if (frames && frames.length > 1 && now - frameStart >= frames[frame].ms) {

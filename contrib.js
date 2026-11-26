@@ -150,7 +150,7 @@
   function tick(now) {
     requestAnimationFrame(tick);
     var sea = window.ocean;
-    if (!visible || !sea || !cells.length) return;
+    if (!visible || !sea || !cells.length || document.documentElement.classList.contains("photo-open")) return;
     var snap = sea.snapshot();
     if (!snap) return;
     var sx = window.scrollX, sy = window.scrollY;

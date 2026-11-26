@@ -238,6 +238,8 @@
   var running = false, last = 0, prev = 0;
   function loop(ts) {
     if (!running) return;
+    // hold still while the photo view is open over the page
+    if (document.documentElement.classList.contains("photo-open")) { prev = 0; requestAnimationFrame(loop); return; }
     if (ts - last >= 1000 / FPS) {
       step(prev ? Math.min(0.08, (ts - prev) / 1000) : 1 / FPS);
       prev = ts;

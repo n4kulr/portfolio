@@ -598,10 +598,11 @@ body:has(main.home) { overflow-x: clip; }
 .photo-lightbox img {
   display: block;
   animation: photo-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1.1) both;
-  height: min(78vh, 720px);
-  max-width: 88vw;
+  /* size to the photo's own shape: never taller or wider than the screen allows */
   width: auto;
-  object-fit: contain;
+  height: auto;
+  max-width: calc(88vw - 24px);
+  max-height: min(78vh, 720px);
   border: 12px solid #fff;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 24px 60px -20px rgba(0, 0, 0, 0.45);
 }
