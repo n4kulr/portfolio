@@ -664,6 +664,11 @@ body:has(main.home) { overflow-x: clip; }
   main.home { align-items: flex-start; padding-top: 88px; padding-bottom: 0; flex: 0 0 auto; }
   /* the sea grows up to meet the graph instead of leaving a gap */
   .ocean { flex: 1 0 320px; height: auto; margin-top: -48px; }
+  /* phones: a longer, stronger fade at the top of the sea */
+  .ocean {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 48px, rgba(0, 0, 0, 0.35) 170px, #000 330px);
+    mask-image: linear-gradient(to bottom, transparent 0, transparent 48px, rgba(0, 0, 0, 0.35) 170px, #000 330px);
+  }
   .intro {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
