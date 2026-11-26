@@ -125,29 +125,94 @@ function drawFront(g, photo) {
   g.textAlign = "left";
 }
 
-function drawBack(g) {
+// the easter egg on the back: a real photo, printed onto the card with faded colour, film grain and a vignette
+async function loadPrint(src, w, h) {
+  const img = new Image();
+  img.src = src;
+  try { await img.decode(); } catch { return null; }
+  const c = Object.assign(document.createElement("canvas"), { width: w, height: h });
+  const g = c.getContext("2d");
+  // fill the frame from the centre of the photo (the photo itself is already cropped)
+  const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+  const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+  g.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  const data = g.getImageData(0, 0, w, h), d = data.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const lum = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+      const nx = x / w - 0.5, ny = y / h - 0.5;
+      const vignette = 1 - 0.55 * (nx * nx + ny * ny) * 2;
+      const grain = (Math.random() - 0.5) * 46;
+      const tint = [8, 3, -8]; // a little warm, like an old print
+      for (let k = 0; k < 3; k++) {
+        let v = d[i + k] * 0.55 + lum * 0.45;       // faded colour
+        v = 22 + v * 0.84;                          // lifted blacks
+        v = v * vignette + grain + tint[k];
+        d[i + k] = Math.max(0, Math.min(255, v));
+      }
+    }
+  }
+  g.putImageData(data, 0, 0);
+  return c;
+}
+
+function drawBack(g, holder) {
   g.fillStyle = PAPER;
   g.fillRect(0, 0, CW, CH);
+  // header either side of the lanyard slot
+  g.fillStyle = DIM;
+  g.font = `600 22px ${MONO}`;
+  g.fillText("PROPERTY OF N. REJEESH", 70, 186);
+  g.textAlign = "right";
+  g.fillText("CARD NO. 0001", CW - 70, 186);
+  g.textAlign = "left";
+
   g.fillStyle = INK;
   g.fillRect(0, 230, CW, 190); // magnetic stripe
+  g.fillStyle = "#3a3a3a";
+  g.font = `600 18px ${MONO}`;
+  g.textAlign = "right";
+  g.fillText("MAGNETIC STRIPE · DO NOT SCRATCH", CW - 40, 404);
+  g.textAlign = "left";
 
+  // the photo, left, under the stripe
+  const px = 70, py = 480, pw = 330, ph = 398; // same shape as images/holder.jpg (221 x 267)
+  if (holder) {
+    g.fillStyle = "#ffffff";
+    g.fillRect(px - 10, py - 10, pw + 20, ph + 20);
+    g.drawImage(holder, px, py, pw, ph);
+    g.strokeStyle = "rgba(0,0,0,0.25)";
+    g.lineWidth = 2;
+    g.strokeRect(px - 10, py - 10, pw + 20, ph + 20);
+  }
+
+  const tx = holder ? 440 : 70;
   g.fillStyle = DIM;
-  g.font = `500 26px ${MONO}`;
-  g.fillText("IF FOUND, PLEASE RETURN TO", 70, 540);
+  g.font = `600 26px ${MONO}`;
+  g.fillText("IF FOUND, PLEASE RETURN TO", tx, 520);
   g.fillStyle = INK;
-  g.font = `400 54px ${SERIF}`;
-  g.fillText("github.com/n4kulr", 70, 620);
+  g.font = `400 50px ${SERIF}`;
+  g.fillText("github.com/n4kulr", tx, 592);
 
   g.fillStyle = DIM;
-  g.font = `400 34px ${SANS}`;
-  const lines = [
-    "This card grants the holder access to",
-    "the projects page and the ocean at",
-    "the bottom of the home page.",
-    "",
-    "Not valid for entry to any real building.",
-  ];
-  lines.forEach((l, i) => g.fillText(l, 70, 760 + i * 52));
+  g.font = `400 31px ${SANS}`;
+  const lines = holder
+    ? ["This card grants the holder", "access to the projects page", "and the ocean at the bottom", "of the home page.", "", "Not valid for entry to", "any real building."]
+    : ["This card grants the holder access to", "the projects page and the ocean at", "the bottom of the home page.", "", "Not valid for entry to any real building."];
+  lines.forEach((l, i) => g.fillText(l, tx, 690 + i * 46));
+
+  // conditions of use, to fill the space under the photo
+  g.fillStyle = DIM;
+  g.font = `600 22px ${MONO}`;
+  g.fillText("CONDITIONS OF USE", 70, 1014);
+  g.font = `400 26px ${SANS}`;
+  [
+    "1.  Do not bend, fold or feed to the ocean.",
+    "2.  The lanyard may twist. This is normal.",
+    "3.  Flip responsibly.",
+    "4.  Report sightings of the holder at github.com/n4kulr.",
+  ].forEach((l, i) => g.fillText(l, 70, 1056 + i * 36));
 
   // signature
   g.strokeStyle = INK;
@@ -165,6 +230,9 @@ function drawBack(g) {
 
   barcode(g, 70, 1460, CW - 140, 110, 0x2005);
   g.fillText("0x4E414B55", 70, 1630);
+  g.textAlign = "right";
+  g.fillText("VALID WHILE STOCKS LAST", CW - 70, 1630);
+  g.textAlign = "left";
 }
 
 // ---------- scene ----------
@@ -206,11 +274,12 @@ async function start() {
     frontTex.needsUpdate = true;
   }
   paintFront(lastPhoto);
-  drawBack(bg);
+  const holder = await loadPrint("images/holder.jpg", 330, 398);
+  drawBack(bg, holder);
   backTex.needsUpdate = true;
 
   const model = gltf.scene;
-  let edge = null;
+  let edge = null, backMesh = null;
   model.traverse((o) => {
     if (!o.isMesh) return;
     if (o.name === "card_front" || o.name === "card_back") {
@@ -223,6 +292,7 @@ async function start() {
       });
     }
     if (o.name === "card_edge") edge = o;
+    if (o.name === "card_back") backMesh = o;
   });
   edge && (edge.material = edge.material.clone());
   if (edge) edge.material.color.set(0xe6e6e0);
@@ -395,8 +465,75 @@ async function start() {
   host.addEventListener("pointerup", endDrag);
   host.addEventListener("pointercancel", endDrag);
 
-  host.addEventListener("click", async () => {
+  // ---------- the photo on the back opens up large ----------
+  // where the print sits on the back face, in canvas pixels (see drawBack)
+  const PHOTO = { x0: 60, y0: 470, x1: 410, y1: 888 };
+  function overPhoto(e) {
+    if (!holder || !backMesh) return false;
+    const s = stage.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((e.clientX - s.left) / s.width) * 2 - 1, -((e.clientY - s.top) / s.height) * 2 + 1);
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObject(model, true)[0];
+    if (!hit || hit.object !== backMesh || !hit.uv) return false;
+    const x = hit.uv.x * CW, y = hit.uv.y * CH;
+    return x >= PHOTO.x0 && x <= PHOTO.x1 && y >= PHOTO.y0 && y <= PHOTO.y1;
+  }
+  host.addEventListener("pointermove", (e) => {
+    if (!drag) host.style.cursor = overPhoto(e) ? "zoom-in" : "";
+  });
+
+  let lightbox = null;
+  async function openPhoto() {
+    if (!lightbox) {
+      // a sharper print for the big view, with the same grain and fade
+      const big = await loadPrint("images/holder.jpg", 804, 971);
+      lightbox = document.createElement("dialog");
+      lightbox.className = "photo-lightbox";
+      lightbox.setAttribute("aria-label", "Photo of Nakul");
+      const fig = document.createElement("figure");
+      const img = document.createElement("img");
+      img.src = (big || holder).toDataURL("image/jpeg", 0.9);
+      img.alt = "Nakul smiling on a lawn at sunset, printed like an old photo";
+      const glare = document.createElement("span");
+      glare.className = "photo-glare";
+      fig.append(img, glare);
+      lightbox.append(fig);
+      document.body.append(lightbox);
+
+      // tilt the print towards the pointer, like spinning album art round with your finger
+      let rx = 0, ry = 0, tx = 0, ty = 0, raf = 0;
+      const tick = () => {
+        rx += (tx - rx) * 0.12;
+        ry += (ty - ry) * 0.12;
+        fig.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+        glare.style.setProperty("--gx", `${50 + ry * 2.4}%`);
+        glare.style.setProperty("--gy", `${50 - rx * 2.4}%`);
+        raf = Math.abs(tx - rx) + Math.abs(ty - ry) > 0.01 ? requestAnimationFrame(tick) : 0;
+      };
+      const aim = (e) => {
+        const r = img.getBoundingClientRect();
+        const nx = Math.max(-1.4, Math.min(1.4, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
+        const ny = Math.max(-1.4, Math.min(1.4, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
+        ty = nx * 16;
+        tx = -ny * 16;
+        if (!raf) raf = requestAnimationFrame(tick);
+      };
+      const settle = () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(tick); };
+      lightbox.addEventListener("pointermove", aim);
+      lightbox.addEventListener("pointerdown", aim);
+      lightbox.addEventListener("pointerleave", settle);
+      lightbox.addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") settle(); });
+      // only a click on the blurred background closes it
+      lightbox.addEventListener("click", (e) => { if (!fig.contains(e.target)) lightbox.close(); });
+      lightbox.addEventListener("close", settle);
+    }
+    lightbox.showModal();
+  }
+
+  host.addEventListener("click", async (e) => {
     if (dragged) { dragged = false; return; }
+    if (overPhoto(e)) { openPhoto(); return; }
     if (!askedTilt) {
       askedTilt = true;
       try {
