@@ -6,15 +6,15 @@
   var screen = sea.querySelector("pre");
 
   var RAMP = " .:-=+*#%@";
-  var ROWS = 34;
+  var ROWS = 40;
   var FPS = 20;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // back to front
   var LAYERS = [
-    { base: 9, amp: 2.4, k: 0.085, w: 0.7, light: 0.3, phase: 0.0 },
-    { base: 16, amp: 4.0, k: 0.06, w: 0.95, light: 0.5, phase: 2.1 },
-    { base: 24, amp: 6.5, k: 0.042, w: 1.2, light: 0.72, phase: 4.4 }
+    { base: 15, amp: 2.4, k: 0.085, w: 0.7, light: 0.3, phase: 0.0, lift: 10 },
+    { base: 23, amp: 4.0, k: 0.06, w: 0.95, light: 0.5, phase: 2.1, lift: 15 },
+    { base: 31, amp: 6.5, k: 0.042, w: 1.2, light: 0.72, phase: 4.4, lift: 20 }
   ];
   var FRONT = LAYERS[LAYERS.length - 1];
 
@@ -37,7 +37,9 @@
     var h = 0.62 * swell(Math.sin(p - q + L.phase))
       + 0.28 * swell(Math.sin(p * 2.3 + q * 1.4 + L.phase * 1.7))
       + 0.1 * Math.sin(p * 5.7 - q * 2.6);
-    var s = L.base - L.amp * h;
+    // the sea piles up on the left: higher water and bigger swells there, calmer to the right
+    var left = Math.pow(1 - Math.max(0, Math.min(1, x / cols)), 1.4);
+    var s = L.base - L.lift * left - L.amp * (0.7 + 0.6 * left) * h;
     if (L === FRONT) {
       for (var i = 0; i < ripples.length; i++) {
         var r = ripples[i], age = t - r.t0, dx = Math.abs(x - r.x);
@@ -49,8 +51,9 @@
 
   function shade(L, x, r, s, slope) {
     var d = r - s;
-    var crest = Math.max(0, (L.base - s) / L.amp); // 0 in troughs, ~1 at peaks
-    var b = L.light * Math.exp(-d * 0.16) - 0.12;                   // fades to blank with depth
+    var left = Math.pow(1 - Math.max(0, Math.min(1, x / cols)), 1.4);
+    var crest = Math.max(0, (L.base - L.lift * left - s) / L.amp); // 0 in troughs, ~1 at peaks
+    var b = L.light * (0.42 + 0.58 * Math.exp(-d * 0.16)) - 0.12;   // darker with depth, never empty
     b += 0.28 * Math.exp(-d * 1.4);                                  // bright rim on the surface
     b += 0.75 * crest * crest * Math.exp(-d * 0.6);                  // foam on the crests
     b += -slope * 0.3 * Math.exp(-d * 0.3);                          // lit from the left

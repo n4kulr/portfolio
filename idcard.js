@@ -220,10 +220,10 @@ async function start() {
   // ---------- motion ----------
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const cur = { x: 0, y: 0, z: 0 }, vel = { x: 0, y: 0, z: 0 }, target = { x: 0, y: 0, z: 0 };
-  let flip = 0, lastInput = 0, gyro = null, lastMouse = null;
+  let flip = 0, lastInput = 0, gyro = null, lastMouse = null, drag = null, dragged = false;
 
   window.addEventListener("pointermove", (e) => {
-    if (e.pointerType !== "mouse") return;
+    if (e.pointerType !== "mouse" || drag) return;
     const r = host.getBoundingClientRect();
     const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (innerWidth / 2)));
     const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (innerHeight / 2)));
@@ -235,7 +235,7 @@ async function start() {
   });
 
   function onTilt(e) {
-    if (e.beta == null || e.gamma == null) return;
+    if (e.beta == null || e.gamma == null || drag) return;
     if (!gyro) gyro = { beta: e.beta };
     const g = Math.max(-1, Math.min(1, e.gamma / 35));
     const b = Math.max(-1, Math.min(1, (e.beta - gyro.beta) / 35));
@@ -251,17 +251,46 @@ async function start() {
 
   if (hint) {
     hint.textContent = touch
-      ? (needsPermission ? "tap the card to turn on tilt" : "tilt your phone · tap to flip")
-      : "move your mouse · click to flip";
+      ? (needsPermission ? "tap the card to turn on tilt" : "drag or tilt · tap to flip")
+      : "move your mouse · drag to spin · click to flip";
   }
 
+  // drag the card around with a finger (or the mouse): it spins freely, then settles on whichever face is nearer
+  host.addEventListener("pointerdown", (e) => {
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lastX: e.clientX, baseY: target.y, baseX: target.x };
+    dragged = false;
+    host.setPointerCapture(e.pointerId);
+  });
+  host.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.hypot(dx, dy) > 6) dragged = true;
+    target.y = drag.baseY + dx * 0.014;
+    target.x = Math.max(-0.9, Math.min(0.9, drag.baseX + dy * 0.008));
+    vel.z += Math.max(-0.03, Math.min(0.03, -(e.clientX - drag.lastX) * 0.001));
+    drag.lastX = e.clientX;
+    lastInput = performance.now();
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag = null;
+    if (!dragged) return;
+    flip = Math.round((target.y + flip) / Math.PI) * Math.PI;
+    target.y = 0;
+    target.x = 0;
+    lastInput = performance.now();
+  }
+  host.addEventListener("pointerup", endDrag);
+  host.addEventListener("pointercancel", endDrag);
+
   host.addEventListener("click", async () => {
+    if (dragged) { dragged = false; return; }
     if (!askedTilt) {
       askedTilt = true;
       try {
         if ((await DeviceOrientationEvent.requestPermission()) === "granted") {
           window.addEventListener("deviceorientation", onTilt);
-          if (hint) hint.textContent = "tilt your phone · tap to flip";
+          if (hint) hint.textContent = "drag or tilt · tap to flip";
           return;
         }
       } catch { /* fall through to a flip */ }
