@@ -8,7 +8,9 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 const host = document.getElementById("id-card");
 const portrait = host && host.querySelector("img");
 
-if (host && portrait && hasWebGL()) start().catch((err) => console.warn("ID card unavailable, keeping the gif", err));
+const done = () => document.documentElement.classList.remove("card-pending");
+if (host && portrait && hasWebGL()) start().catch((err) => console.warn("ID card unavailable, keeping the gif", err)).finally(done);
+else done();
 
 function hasWebGL() {
   try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; }

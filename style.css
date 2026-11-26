@@ -123,14 +123,14 @@ main.home {
 @media (min-width: 601px) {
   .home h1 { white-space: nowrap; }
   /* graph sits under the links, beside the card, a few months wide and scrolling sideways */
-  .intro.has-card {
+  .intro {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     column-gap: 28px;
     align-items: center;
   }
-  .intro.has-card .id-card { grid-column: 1; grid-row: 1 / span 2; }
-  .intro.has-card .intro-copy { grid-column: 2; grid-row: 1; align-self: end; }
+  .intro .id-card { grid-column: 1; grid-row: 1 / span 2; }
+  .intro .intro-copy { grid-column: 2; grid-row: 1; align-self: end; }
   .contrib.home-contrib {
     grid-column: 2;
     grid-row: 2;
@@ -483,9 +483,13 @@ main.home {
   flex-shrink: 0;
 }
 
-.id-card.is-3d {
+/* the card's spot is sized from the first paint, so nothing jumps when the 3D card arrives */
+.id-card {
   width: 260px;
   height: 400px;
+}
+
+.id-card.is-3d {
   cursor: grab;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
@@ -499,7 +503,7 @@ main.home {
     padding-top: var(--lanyard);
     padding-bottom: 28px;
   }
-  .id-card.is-3d {
+  .id-card {
     width: auto;
     max-width: 260px;
     height: clamp(300px, calc(100svh - 320px - var(--lanyard) - 28px), 400px);
@@ -530,6 +534,10 @@ body:has(main.home) { overflow-x: clip; }
   width: 100%;
   height: 100%;
 }
+
+/* while the 3D card loads, keep the plain gif hidden; if 3D never comes, it shows in the card's spot */
+.card-pending .id-card .intro-mark { visibility: hidden; }
+.id-card:not(.is-3d) .intro-mark { width: 100%; height: 100%; object-fit: contain; }
 
 /* the gif stays in the page as the texture source, just out of sight */
 .id-card.is-3d .intro-mark {
@@ -588,7 +596,7 @@ body:has(main.home) { overflow-x: clip; }
   main.home { align-items: flex-start; padding-top: 88px; padding-bottom: 0; flex: 0 0 auto; }
   /* the sea grows up to meet the graph instead of leaving a gap */
   .ocean { flex: 1 0 320px; height: auto; margin-top: -48px; }
-  .intro.has-card {
+  .intro {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
@@ -596,45 +604,45 @@ body:has(main.home) { overflow-x: clip; }
     row-gap: 18px;
     width: 100%;
   }
-  .intro.has-card .intro-copy {
+  .intro .intro-copy {
     display: block;
     grid-column: 2;
     grid-row: 1;
     min-width: 0;
     align-self: center;
   }
-  .intro.has-card .id-card {
+  .intro .id-card {
     grid-column: 1;
     grid-row: 1;
     width: 128px;
     height: 214px;
   }
-  .intro.has-card h1 {
+  .intro h1 {
     font-size: 1.85rem;
     line-height: 1.05;
     margin-bottom: 6px;
   }
-  .intro.has-card .tagline {
+  .intro .tagline {
     font-size: 14px;
     line-height: 1.3;
     margin-bottom: 10px;
   }
-  .intro.has-card .bio {
+  .intro .bio {
     font-size: 12px;
     margin-bottom: 4px;
     text-align: left;
   }
-  .intro.has-card .langs {
+  .intro .langs {
     font-size: 11px;
     line-height: 1.45;
     margin-bottom: 8px;
     text-align: left;
   }
-  .intro.has-card .links { justify-content: flex-start; gap: 12px; }
-  .intro.has-card .links a { font-size: 12px; }
+  .intro .links { justify-content: flex-start; gap: 12px; }
+  .intro .links a { font-size: 12px; }
   .home-contrib { grid-column: 1 / -1; }
-  .intro.has-card .bio { margin-bottom: 6px; }
-  .intro.has-card .langs { margin-bottom: 20px; }
+  .intro .bio { margin-bottom: 6px; }
+  .intro .langs { margin-bottom: 20px; }
   .home-contrib {
     margin: 2px 0 0;
     padding: 0;

@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nakul Rejeesh</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // hide the plain gif while the 3D ID card loads (idcard.js clears this; the timeout is a safety net)
+    document.documentElement.classList.add("card-pending");
+    setTimeout(function () { document.documentElement.classList.remove("card-pending"); }, 8000);
+  </script>
 </head>
 <body>
   <nav>
