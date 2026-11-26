@@ -13,6 +13,7 @@
       image: "images/guessify-demo.png", alt: "Guessify gameplay preview",
       album: { title: "Blonde", artist: "Frank Ocean", spine: "images/spines/blonde.jpg" },
       desc: "Hear a few seconds of a song, name it before the timer runs out. Play solo, in a party room, or online against other people.",
+      why: "i used to play guess-the-song games all the time as a kid, so this is my take on one. it's still my favourite kind of game.",
       tags: ["React", "Vite", "JavaScript", "PartyKit", "Cloudflare Workers", "Vercel"]
     },
     {
@@ -20,6 +21,7 @@
       image: "images/drawmethis-demo.jpg", alt: "drawmethis drawing page",
       album: { title: "Who Really Cares", artist: "TV Girl", spine: "images/spines/who-really-cares.jpg" },
       desc: "Sketch something in the browser, hit send, and it drops straight into a Discord channel.",
+      why: "made so me and my friends could mess around sending each other drawings. no accounts, no app, just draw and send.",
       tags: ["React", "Vite", "GSAP", "Framer Motion", "Discord"]
     },
     {
@@ -27,6 +29,7 @@
       image: "images/outliner-demo.jpg", alt: "Outliner month calendar with the course outline drop panel",
       album: { title: "Gemini Rights", artist: "Steve Lacy", spine: "images/spines/gemini-rights.jpg" },
       desc: "Drop in your UNSW course outlines and every assessment lands on one calendar, with week numbers worked out and an export to Google, Apple or Outlook.",
+      why: "started as practice for AI automation, then turned out to be useful for real once i started my internship at Agent Genius.",
       tags: ["Next.js", "TypeScript", "React", "Tailwind CSS", "PDF parsing", "iCal"]
     },
     {
@@ -34,6 +37,7 @@
       image: "images/hitthatbeat-demo.jpg", alt: "hitthatbeat home screen with the four note lanes",
       album: { title: "Speak Now", artist: "Taylor Swift", spine: "images/spines/speak-now.jpg" },
       desc: "Drop in any song and play it as a four-lane rhythm game, with charts from easy to expert built straight from the audio.",
+      why: "made for my sister. she loves rhythm games like RoBeats on Roblox, so now any song she likes can be one.",
       tags: ["TypeScript", "Vite", "Vercel"]
     },
     {
@@ -41,6 +45,7 @@
       image: "images/linkedout-demo.jpg", alt: "LinkedOut feed of failure posts",
       album: { title: "Die Lit", artist: "Playboi Carti", spine: "images/spines/die-lit.jpg" },
       desc: "The opposite of LinkedIn — a social network for failures and rejections. Winner, UNSW Terrible Ideas Hackathon 2025.",
+      why: "built with a team at UNSW's Terrible Ideas Hackathon, where the brief is to make a bad idea as well as you can. we flipped linkedin upside down and it won.",
       tags: ["Node.js", "Express", "PostgreSQL", "JavaScript", "Vercel"]
     },
     {
@@ -48,6 +53,7 @@
       image: "images/fotos-demo.jpg", alt: "fotos album grid",
       album: { title: "Whole Lotta Red", artist: "Playboi Carti", spine: "images/spines/whole-lotta-red.jpg" },
       desc: "A private photo and video gallery that installs like an app, hidden behind a passcode lock screen.",
+      why: "made for my mum. she's not that tech savvy, so instead of downloading every photo she can just open this and see all our family photos in one place.",
       tags: ["JavaScript", "PWA", "Cloudflare Workers", "sharp"]
     },
     {
@@ -55,6 +61,7 @@
       image: "images/nucleo.svg", alt: "STM32 Nucleo board illustration", svg: true,
       album: { title: "Goodbye & Good Riddance", artist: "Juice WRLD", spine: "images/spines/goodbye-good-riddance.jpg" },
       desc: "An access-control system on an STM32 Nucleo-F303RE — scan a card or type a code to open the gate, with an LCD, keypad, LEDs and a buzzer handling the feedback.",
+      why: "it's a gate. scan a card or punch in a code and it decides whether you're getting in.",
       built: [
         "Written mostly in C on the F303RE's 72 MHz Cortex-M4, with about 10% hand-written in ARM assembly",
         "My part of the build: the PN532 RFID/NFC reader, a shift-register LED bank, the buzzer and the switches",
@@ -68,6 +75,7 @@
       image: "images/itsquiz.svg", alt: "Quiz app illustration", svg: true,
       album: { title: "Certified Lover Boy", artist: "Drake", spine: "images/spines/certified-lover-boy.jpg" },
       desc: "A full-stack quiz app in the shape of Kahoot — build a quiz, host a session, players join and answer.",
+      why: "the group project for COMP1531, UNSW's Software Engineering Fundamentals course. the whole term goes into building Toohak, a Kahoot-style quiz app, as a team, so it's as much about git workflows, code review, testing and working in sprints as it is about the code.",
       built: [
         "Built as a team in TypeScript and JavaScript, tracked on GitLab",
         "A REST API for creating quizzes, hosting sessions and scoring answers",
@@ -81,6 +89,7 @@
       image: "images/gitavadi.svg", alt: "Gitavadi illustration", svg: true,
       album: { title: "WRLD ON DRUGS", artist: "Future & Juice WRLD", spine: "images/spines/wrld-on-drugs.jpg" },
       desc: "A native iOS reader for the Bhagavad Gita — move through all 18 chapters and 700 verses.",
+      why: "made for my mum again. she's religious and reads the Gita, so i built her a clean, simple way to read it on her phone. it was also my first proper go at Swift.",
       built: [
         "Swift and SwiftUI — my first native mobile app",
         "A clean reader for all 18 chapters and 700 verses, chapter by chapter",
@@ -170,6 +179,10 @@
     info.appendChild(shot);
 
     info.appendChild(el("p", "cd-desc", cd.desc));
+    if (cd.why) {
+      info.appendChild(el("p", "cd-sub", "why i made it"));
+      info.appendChild(el("p", "cd-desc cd-why", cd.why));
+    }
     if (cd.built) {
       if (!cd.about) info.appendChild(el("p", "cd-sub", "what i built"));
       var ul = el("ul", "cd-built");
