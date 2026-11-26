@@ -1,13 +1,15 @@
 // ASCII ocean footer for the home page, drawn in a dense ink ramp (" .:*IVFN") like old ASCII art prints.
 // The front swell is a 1D fluid surface: move the mouse or drag a finger through it to push the water
-// around and send waves travelling; click or tap to splash.
+// around and send waves travelling; click or tap to splash. It also exposes window.ocean so the GitHub
+// graph (contrib.js) can read the water line and call up swells that reach into it.
 (function () {
   var sea = document.getElementById("ocean");
   if (!sea) return;
   var screen = sea.querySelector("pre");
 
   var RAMP = " .:*IVFN";
-  var ROWS = 40;
+  var ROWS = 40;     // grows with the footer's height (it fills the space on phones)
+  var REF_ROWS = 40;  // the fade is measured against the normal height so a taller sea keeps the same look
   var FPS = 24;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -19,7 +21,7 @@
   ];
   var FRONT = LAYERS[LAYERS.length - 1];
 
-  var cols = 0, t = 0, spray = [];
+  var cols = 0, t = 0, spray = [], swells = [], lastFront = null;
   var h = new Float32Array(0), v = new Float32Array(0); // simulated surface offset (rows, + is down)
 
   function hash(x, y) {
@@ -56,7 +58,7 @@
         v[i] += (140 * (l + r - 2 * h[i]) - 4 * h[i]) * d;
         v[i] *= 0.99;
       }
-      for (i = 0; i < n; i++) h[i] = Math.max(-9, Math.min(9, h[i] + v[i] * d));
+      for (i = 0; i < n; i++) h[i] = Math.max(-34, Math.min(9, h[i] + v[i] * d));
       // a touch of smoothing keeps neighbouring columns from tearing apart
       for (i = 1; i < n - 1; i++) h[i] += (h[i - 1] + h[i + 1] - 2 * h[i]) * 0.08;
     }
@@ -93,17 +95,20 @@
     return ink;
   }
 
+  var lineH = 8;
   function measure() {
     var probe = document.createElement("span");
     probe.textContent = "M".repeat(40);
     screen.appendChild(probe);
-    var cw = probe.getBoundingClientRect().width / 40 || 5;
+    var r = probe.getBoundingClientRect();
     screen.removeChild(probe);
-    return cw;
+    lineH = parseFloat(getComputedStyle(screen).lineHeight) || 8;
+    return r.width / 40 || 5;
   }
 
   function layout() {
     var n = Math.max(40, Math.ceil(sea.clientWidth / measure()));
+    ROWS = Math.max(REF_ROWS, Math.ceil(sea.clientHeight / lineH));
     if (n === cols) return;
     var nh = new Float32Array(n), nv = new Float32Array(n);
     nh.set(h.subarray(0, Math.min(n, h.length)));
@@ -117,6 +122,7 @@
       for (var x = -1; x <= cols; x++) a[x + 1] = surface(L, x);
       return a;
     });
+    lastFront = surf[surf.length - 1];
     var lines = [];
     for (var r = 0; r < ROWS; r++) {
       var line = "";
@@ -131,7 +137,7 @@
         }
         ink = Math.max(0, Math.min(0.999, ink));
         // stay quiet at the top and only reach full ink near the bottom
-        var u = r / (ROWS * 0.92);
+        var u = r / (REF_ROWS * 0.92);
         var fade = u >= 1 ? 1 : u * u * (3 - 2 * u);
         ink *= fade;
         line += RAMP[Math.floor(ink * RAMP.length)];
@@ -141,7 +147,7 @@
     spray.forEach(function (p) {
       var px = Math.round(p.x), py = Math.round(p.y);
       if (px < 0 || px >= cols || py < 0 || py >= ROWS) return;
-      if (py / (ROWS * 0.92) < 0.28) return;
+      if (py / (REF_ROWS * 0.92) < 0.28) return;
       lines[py] = lines[py].slice(0, px) + (p.vy < 0 ? "'" : ".") + lines[py].slice(px + 1);
     });
     screen.textContent = lines.join("\n");
@@ -149,6 +155,12 @@
 
   function step(dt) {
     t += dt;
+    // swells called up by the graph: lift the water until it reaches the line it was asked for
+    swells = swells.filter(function (w) {
+      if (t > w.until || surface(FRONT, w.x) <= w.row) return false;
+      push(w.x, -1100 * dt, 5);
+      return true;
+    });
     stepSim(dt);
     // fast-rising water throws off spray
     for (var i = 1; i < cols - 1; i += 2) {
@@ -195,6 +207,32 @@
     push(c.x, 45, 3.5);
     splash(c.x, surface(FRONT, c.x) - 1, 36, 22);
   });
+
+  // ---------- for the GitHub graph ----------
+  window.ocean = {
+    // where the front water line is right now, in client pixels
+    snapshot: function () {
+      if (!lastFront || !cols) return null;
+      var r = screen.getBoundingClientRect();
+      return {
+        left: r.left, top: r.top, cols: cols,
+        cw: r.width / cols, rh: r.height / ROWS,
+        surf: lastFront.subarray(1, cols + 1), v: v
+      };
+    },
+    splash: function (clientX, n) {
+      var r = screen.getBoundingClientRect(), x = (clientX - r.left) / (r.width / cols);
+      splash(x, surface(FRONT, x) - 1, n || 3, 12);
+    },
+    // raise a swell under clientX until its crest reaches clientY
+    swell: function (clientX, clientY) {
+      if (reduce || !cols) return;
+      var r = screen.getBoundingClientRect();
+      var x = (clientX - r.left) / (r.width / cols);
+      var row = Math.max(1, (clientY - r.top) / (r.height / ROWS));
+      swells.push({ x: x, row: row, until: t + 1.4 });
+    }
+  };
 
   // ---------- loop ----------
   var running = false, last = 0, prev = 0;

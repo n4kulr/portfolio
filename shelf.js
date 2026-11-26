@@ -3,6 +3,9 @@
   var row = document.getElementById("shelf-row");
   var detail = document.getElementById("cd-detail");
   if (!row || !detail) return;
+  var shelf = row.parentElement;
+  // PC: the rack starts centred; picking a CD slides it left and opens the project beside it
+  var wide = window.matchMedia("(min-width: 861px)");
 
   var CDS = [
     {
@@ -197,9 +200,28 @@
   }
 
   var current = -1;
+  function centre() {
+    var off = Math.max(0, (shelf.clientWidth - row.scrollWidth) / 2);
+    shelf.style.setProperty("--centre", off + "px");
+  }
+  function close() {
+    current = -1;
+    shelf.classList.remove("is-open");
+    buttons.forEach(function (b, j) {
+      b.classList.remove("is-selected");
+      b.setAttribute("aria-selected", "false");
+      b.tabIndex = j === 0 ? 0 : -1;
+    });
+    detail.textContent = "";
+    history.replaceState(null, "", location.pathname);
+  }
   function select(i, fromUser) {
-    if (i === current) return;
+    if (i === current) {
+      if (fromUser && wide.matches) close(); // clicking the open CD again puts it back
+      return;
+    }
     current = i;
+    shelf.classList.add("is-open");
     buttons.forEach(function (b, j) {
       var on = j === i;
       b.classList.toggle("is-selected", on);
@@ -214,10 +236,17 @@
     }
   }
 
-  var start = 0;
+  centre();
+  window.addEventListener("resize", centre);
+  if (wide.addEventListener) wide.addEventListener("change", centre);
+
+  var start = wide.matches ? -1 : 0;
   if (location.hash) {
     var k = CDS.findIndex(function (cd) { return "#" + cd.id === location.hash; });
     if (k >= 0) start = k;
   }
-  select(start, false);
+  if (start >= 0) select(start, false);
+  else buttons[0].tabIndex = 0;
+  // let the first layout settle before the rack is allowed to animate
+  requestAnimationFrame(function () { shelf.classList.add("is-ready"); });
 })();

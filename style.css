@@ -39,7 +39,7 @@ body:has(main.home) nav {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 3;
   background: var(--bg);
 }
 
@@ -89,7 +89,7 @@ main.projects {
 main.home {
   flex: 1;
   width: 100%;
-  max-width: 880px;
+  max-width: 900px;
   display: flex;
   align-items: center;
 }
@@ -122,8 +122,31 @@ main.home {
 
 @media (min-width: 601px) {
   .home h1 { white-space: nowrap; }
-  .home-contrib { display: none; }
+  /* graph sits under the links, beside the card, a few months wide and scrolling sideways */
+  .intro.has-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 28px;
+    align-items: center;
+  }
+  .intro.has-card .id-card { grid-column: 1; grid-row: 1 / span 2; }
+  .intro.has-card .intro-copy { grid-column: 2; grid-row: 1; align-self: end; }
+  .contrib.home-contrib {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    max-width: 440px;
+    margin: 28px 0 0;
+    padding: 0;
+    border: 0;
+  }
+  .home-contrib .contrib-inner { min-width: 620px; }
+  .home-contrib .contrib-scroll { cursor: grab; }
+  .home-contrib .contrib-scroll.is-dragging { cursor: grabbing; }
 }
+
+/* squares the sea reaches soak up ink (--wet goes 0 to 1), then dry back to their own colour */
+.contrib-cell { background-image: linear-gradient(rgba(17, 17, 17, calc(var(--wet, 0) * 0.8)), rgba(17, 17, 17, calc(var(--wet, 0) * 0.8))); }
 
 .tagline {
   font-size: 18px;
@@ -317,8 +340,45 @@ main.home {
   to { opacity: 1; transform: none; }
 }
 
+/* PC: rack in the middle until a CD is picked, then it slides left and the project opens beside it */
+@media (min-width: 861px) {
+  main.projects { max-width: 1120px; }
+  .shelf {
+    display: flex;
+    align-items: flex-start;
+    gap: 44px;
+  }
+  .shelf-row {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    overflow: visible;
+    position: sticky;
+    top: 24px;
+    transform: translateX(var(--centre, 0px));
+  }
+  .shelf.is-ready .shelf-row { transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .shelf.is-open .shelf-row { transform: none; }
+  .cd-detail {
+    flex: 1;
+    min-width: 0;
+    margin-top: 28px;
+    opacity: 0;
+    transform: translateX(48px);
+    visibility: hidden;
+  }
+  .shelf.is-ready .cd-detail {
+    transition: opacity 0.45s ease 0.18s, transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.65s;
+  }
+  .shelf.is-open .cd-detail {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    transition-delay: 0.18s, 0s, 0s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .cd, .cd-detail.is-open .cd-info { transition: none; animation: none; }
+  .cd, .cd-detail.is-open .cd-info, .shelf .shelf-row, .shelf .cd-detail { transition: none !important; animation: none; }
 }
 
 /* CONTRIBUTIONS */
@@ -445,7 +505,7 @@ main.home {
 /* full-width layer behind the hero text that the card is drawn on */
 main.home { position: relative; }
 body:has(main.home) { overflow-x: clip; }
-.intro { position: relative; z-index: 1; }
+.intro { position: relative; z-index: 2; }
 
 .id-card-stage {
   position: absolute;
@@ -454,7 +514,7 @@ body:has(main.home) { overflow-x: clip; }
   left: 50%;
   width: 100vw;
   transform: translateX(-50%);
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -477,15 +537,26 @@ body:has(main.home) { overflow-x: clip; }
 
 /* OCEAN */
 .ocean {
+  position: relative;
   width: 100%;
+  height: 320px;
+  flex: 0 0 auto;
   overflow: hidden;
   cursor: crosshair;
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 12%, #000 78%);
-  mask-image: linear-gradient(to bottom, transparent 0%, transparent 12%, #000 78%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 14px, #000 230px);
+  mask-image: linear-gradient(to bottom, transparent 0, transparent 14px, #000 230px);
+  z-index: 0;
 }
+
+/* desktop: the sea tucks up under the bottom of the hero so its swells can reach the graph */
+@media (min-width: 601px) {
+  .ocean { margin-top: -96px; }
+}
+
+.ocean pre { position: absolute; top: 0; left: 0; }
 
 .ocean pre {
   font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -507,7 +578,9 @@ body:has(main.home) { overflow-x: clip; }
   .cd { width: 26px; }
   .cd-detail { padding: 24px 18px; }
   .cd-title { font-size: 1.6rem; }
-  main.home { align-items: flex-start; padding-top: 88px; }
+  main.home { align-items: flex-start; padding-top: 88px; padding-bottom: 0; flex: 0 0 auto; }
+  /* the sea grows up to meet the graph instead of leaving a gap */
+  .ocean { flex: 1 0 320px; height: auto; margin-top: -48px; }
   .intro.has-card {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -560,5 +633,4 @@ body:has(main.home) { overflow-x: clip; }
     padding: 0;
     border: 0;
   }
-  main.projects .contrib { display: none; }
 }

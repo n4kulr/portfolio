@@ -175,6 +175,7 @@ async function start() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 0.82;
   const scene = new THREE.Scene();
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
   const key = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -213,10 +214,10 @@ async function start() {
     if (o.name === "card_front" || o.name === "card_back") {
       o.material = new THREE.MeshPhysicalMaterial({
         map: o.name === "card_front" ? frontTex : backTex,
-        roughness: 0.6,
-        envMapIntensity: 0.55,
-        clearcoat: 1,
-        clearcoatRoughness: 0.12,
+        roughness: 0.65,
+        envMapIntensity: 0.35,
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.25,
       });
     }
     if (o.name === "card_edge") edge = o;
@@ -224,70 +225,170 @@ async function start() {
   edge && (edge.material = edge.material.clone());
   if (edge) edge.material.color.set(0xe6e6e0);
 
-  // hang the card from the top of the lanyard connector so it swings like a real badge
-  const PIVOT = 56.6;
+  // the model's rigid strap is replaced by a simulated lanyard (below)
+  model.traverse((o) => { if (o.name === "card_strap") o.visible = false; });
+
+  // the card hangs from the top of the lanyard connector
+  const PIVOT = 56.6; // connector top, in model space
+  const HANG = 48;    // where the connector sits at rest, in world space
   const pivot = new THREE.Group();
   model.position.y = -PIVOT;
   pivot.add(model);
-  pivot.position.y = 48;
   scene.add(pivot);
+
+  // ---------- lanyard: a rope of points fixed above the page, with the card on the end ----------
+  const N = 20;
+  const pts = Array.from({ length: N + 1 }, () => new THREE.Vector3());
+  const old = Array.from({ length: N + 1 }, () => new THREE.Vector3());
+  const anchor = new THREE.Vector3(0, 220, 0);
+  let seg = 8;
+  function buildRope() {
+    const end = new THREE.Vector3(0, HANG, 0);
+    seg = anchor.distanceTo(end) / N;
+    for (let i = 0; i <= N; i++) {
+      pts[i].lerpVectors(anchor, end, i / N);
+      old[i].copy(pts[i]);
+    }
+  }
+
+  // a printed fabric strap
+  const STRAP_W = 13;
+  const print = Object.assign(document.createElement("canvas"), { width: 128, height: 1024 });
+  {
+    const g = print.getContext("2d");
+    g.fillStyle = "#151515";
+    g.fillRect(0, 0, 128, 1024);
+    g.fillStyle = "rgba(255,255,255,0.06)";
+    for (let y = 0; y < 1024; y += 4) g.fillRect(0, y, 128, 1); // woven ribs
+    g.translate(64, 1024);
+    g.rotate(-Math.PI / 2);
+    g.fillStyle = "#d8d8d4";
+    g.font = `600 46px ${MONO}`;
+    g.textBaseline = "middle";
+    g.fillText("NAKUL REJEESH  ·  ACCESS ALL AREAS  ·", 24, 0);
+  }
+  const printTex = new THREE.CanvasTexture(print);
+  printTex.colorSpace = THREE.SRGBColorSpace;
+  printTex.wrapT = THREE.RepeatWrapping;
+  printTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const strapGeo = new THREE.BufferGeometry();
+  const strapPos = new Float32Array((N + 1) * 2 * 3);
+  const strapUv = new Float32Array((N + 1) * 2 * 2);
+  const strapIdx = [];
+  for (let i = 0; i < N; i++) {
+    const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
+    strapIdx.push(a, c, b, b, c, d);
+  }
+  strapGeo.setAttribute("position", new THREE.BufferAttribute(strapPos, 3));
+  strapGeo.setAttribute("uv", new THREE.BufferAttribute(strapUv, 2));
+  strapGeo.setIndex(strapIdx);
+  const strap = new THREE.Mesh(strapGeo, new THREE.MeshStandardMaterial({
+    map: printTex, roughness: 0.85, metalness: 0, side: THREE.DoubleSide,
+  }));
+  strap.frustumCulled = false;
+  scene.add(strap);
+
+  const tmpT = new THREE.Vector3(), tmpF = new THREE.Vector3(), tmpS = new THREE.Vector3();
+  function updateStrap(yaw) {
+    const len = seg * N;
+    for (let i = 0; i <= N; i++) {
+      const p = pts[i];
+      tmpT.subVectors(pts[Math.min(N, i + 1)], pts[Math.max(0, i - 1)]).normalize();
+      // the strap twists along its length to meet the card, like a real lanyard when the badge turns
+      const u = i / N, a = yaw * u * u * (3 - 2 * u);
+      tmpF.set(Math.sin(a), 0, Math.cos(a));
+      tmpS.crossVectors(tmpT, tmpF).normalize().multiplyScalar(STRAP_W / 2);
+      strapPos.set([p.x - tmpS.x, p.y - tmpS.y, p.z - tmpS.z, p.x + tmpS.x, p.y + tmpS.y, p.z + tmpS.z], i * 6);
+      const v = (len * (1 - u)) / 70; // one print repeat every 70 units
+      strapUv.set([1, v, 0, v], i * 4);
+    }
+    strapGeo.attributes.position.needsUpdate = true;
+    strapGeo.attributes.uv.needsUpdate = true;
+    strapGeo.computeVertexNormals();
+  }
 
   // ---------- motion ----------
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const cur = { x: 0, y: 0, z: 0 }, vel = { x: 0, y: 0, z: 0 }, target = { x: 0, y: 0, z: 0 };
-  let flip = 0, lastInput = 0, gyro = null, lastMouse = null, drag = null, dragged = false;
+  const G = 9800 * 0.6;                       // gravity, world units / s^2
+  const gravity = new THREE.Vector3(0, -G, 0);
+  const cur = { x: 0, y: 0 }, vel = { x: 0, y: 0 }, target = { x: 0, y: 0 };
+  let flip = 0, gyro = null, lastMouse = null, drag = null, dragged = false;
+  let worldPerPx = 0.3;
+  const grabTarget = new THREE.Vector3();
 
+  function nudge(dxWorld, dyWorld) { // push the card sideways, as if brushed past
+    old[N].x -= dxWorld;
+    old[N].y -= dyWorld;
+  }
+
+  // the mouse only matters when it's near the card
+  const REACH = 130;
   window.addEventListener("pointermove", (e) => {
     if (e.pointerType !== "mouse" || drag) return;
     const r = host.getBoundingClientRect();
-    const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (innerWidth / 2)));
-    const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (innerHeight / 2)));
-    target.y = nx * 0.75;
-    target.x = ny * 0.35;
-    if (lastMouse) vel.z += Math.max(-0.02, Math.min(0.02, -(e.clientX - lastMouse) * 0.0006));
-    lastMouse = e.clientX;
-    lastInput = performance.now();
+    const dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right);
+    const dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom);
+    const k = Math.max(0, 1 - Math.hypot(dx, dy) / REACH);
+    if (k > 0) {
+      const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2 + REACH)));
+      const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2 + REACH)));
+      target.y = nx * 0.35 * k;
+      target.x = ny * 0.12 * k;
+      if (lastMouse) {
+        const mx = Math.max(-40, Math.min(40, e.clientX - lastMouse.x));
+        const my = Math.max(-40, Math.min(40, e.clientY - lastMouse.y));
+        nudge(mx * worldPerPx * 0.012 * k * k, -my * worldPerPx * 0.005 * k * k);
+      }
+    } else {
+      target.y = 0;
+      target.x = 0;
+    }
+    lastMouse = { x: e.clientX, y: e.clientY };
   });
 
+  // phones: tilting the phone tilts gravity, so the card keeps hanging "down"
   function onTilt(e) {
-    if (e.beta == null || e.gamma == null || drag) return;
+    if (e.beta == null || e.gamma == null) return;
     if (!gyro) gyro = { beta: e.beta };
-    const g = Math.max(-1, Math.min(1, e.gamma / 35));
-    const b = Math.max(-1, Math.min(1, (e.beta - gyro.beta) / 35));
-    target.y = g * 0.8;
-    target.z = -g * 0.25;
-    target.x = b * 0.4;
-    lastInput = performance.now();
+    const g = THREE.MathUtils.degToRad(Math.max(-60, Math.min(60, e.gamma)));
+    gravity.set(Math.sin(g) * G, -Math.cos(g) * G, 0);
+    target.y = Math.max(-1, Math.min(1, e.gamma / 35)) * 0.5;
+    target.x = Math.max(-1, Math.min(1, (e.beta - gyro.beta) / 35)) * 0.35;
   }
   const needsPermission = typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
   if (!needsPermission) window.addEventListener("deviceorientation", onTilt);
   let askedTilt = !needsPermission;
 
-
-  // drag the card around with a finger (or the mouse): it spins freely, then settles on whichever face is nearer
+  // drag the card: it pulls on the lanyard, swings when you let go, and spins with sideways throws
+  function pointerWorld(e) {
+    const s = stage.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((e.clientX - s.left) / s.width) * 2 - 1, -((e.clientY - s.top) / s.height) * 2 + 1);
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(ndc, camera);
+    const hit = new THREE.Vector3();
+    return ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit) ? hit : null;
+  }
   host.addEventListener("pointerdown", (e) => {
-    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lastX: e.clientX, baseY: target.y, baseX: target.x };
+    const w = pointerWorld(e);
+    if (!w) return;
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lastX: e.clientX, off: new THREE.Vector3().subVectors(pts[N], w) };
+    grabTarget.copy(pts[N]);
     dragged = false;
     host.setPointerCapture(e.pointerId);
   });
   host.addEventListener("pointermove", (e) => {
     if (!drag || e.pointerId !== drag.id) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (Math.hypot(dx, dy) > 6) dragged = true;
-    target.y = drag.baseY + dx * 0.014;
-    target.x = Math.max(-0.9, Math.min(0.9, drag.baseX + dy * 0.008));
-    vel.z += Math.max(-0.03, Math.min(0.03, -(e.clientX - drag.lastX) * 0.001));
+    if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6) dragged = true;
+    const w = pointerWorld(e);
+    if (w) grabTarget.copy(w).add(drag.off);
+    vel.y += Math.max(-0.08, Math.min(0.08, (e.clientX - drag.lastX) * 0.004));
     drag.lastX = e.clientX;
-    lastInput = performance.now();
   });
   function endDrag(e) {
     if (!drag || e.pointerId !== drag.id) return;
     drag = null;
     if (!dragged) return;
-    flip = Math.round((target.y + flip) / Math.PI) * Math.PI;
-    target.y = 0;
-    target.x = 0;
-    lastInput = performance.now();
+    flip = Math.round((cur.y - target.y) / Math.PI) * Math.PI;
   }
   host.addEventListener("pointerup", endDrag);
   host.addEventListener("pointercancel", endDrag);
@@ -304,8 +405,66 @@ async function start() {
       } catch { /* fall through to a flip */ }
     }
     flip += Math.PI;
-    vel.z += 0.04;
+    nudge(1.2, 0);
   });
+
+  // ---------- physics ----------
+  const STEP = 1 / 120;
+  let acc = 0, simT = 0;
+  function simulate(dt) {
+    acc = Math.min(acc + dt, 0.1);
+    while (acc >= STEP) {
+      acc -= STEP;
+      simT += STEP;
+      // a faint breeze keeps it alive when nobody's touching it
+      const wind = reduce ? 0 : Math.sin(simT * 0.7) * 120 + Math.sin(simT * 1.9) * 50;
+      for (let i = 1; i <= N; i++) {
+        const p = pts[i], o = old[i];
+        const vx = (p.x - o.x) * 0.996, vy = (p.y - o.y) * 0.996, vz = (p.z - o.z) * 0.95;
+        o.copy(p);
+        p.x += vx + (gravity.x + wind) * STEP * STEP;
+        p.y += vy + gravity.y * STEP * STEP;
+        p.z += vz;
+      }
+      if (drag) pts[N].lerp(grabTarget, 0.35);
+      // keep each link from stretching; the strap can still go slack and bend
+      for (let it = 0; it < 14; it++) {
+        pts[0].copy(anchor);
+        for (let i = 0; i < N; i++) {
+          const a = pts[i], b = pts[i + 1];
+          tmpT.subVectors(b, a);
+          const len = tmpT.length();
+          if (len <= seg || len === 0) continue;
+          const wa = i === 0 ? 0 : 1;
+          const wb = i + 1 === N ? (drag ? 0 : 0.2) : 1; // the card end is heavy
+          const k = (len - seg) / len / (wa + wb || 1);
+          a.addScaledVector(tmpT, k * wa);
+          b.addScaledVector(tmpT, -k * wb);
+        }
+      }
+      // twist: spring the card's spin towards its target (the strap's torsion)
+      const tgtY = target.y + flip, tgtX = target.x;
+      vel.y += (tgtY - cur.y) * 0.008;
+      vel.x += (tgtX - cur.x) * 0.015;
+      vel.y *= 0.955;
+      vel.x *= 0.9;
+      cur.y += vel.y;
+      cur.x += vel.x;
+    }
+  }
+
+  const up = new THREE.Vector3(), qSwing = new THREE.Quaternion(), qSpin = new THREE.Quaternion();
+  const Y = new THREE.Vector3(0, 1, 0), euler = new THREE.Euler();
+  function placeCard() {
+    pivot.position.copy(pts[N]);
+    // the card hangs along the last stretch of strap
+    up.subVectors(pts[N - 2], pts[N]).normalize();
+    qSwing.setFromUnitVectors(Y, up);
+    qSpin.setFromEuler(euler.set(cur.x, cur.y, 0, "YXZ"));
+    pivot.quaternion.copy(qSwing).multiply(qSpin);
+    // the strap only ever twists up to half a turn, however many times the card has been flipped
+    updateStrap(((cur.y % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+  }
 
   // ---------- mount ----------
   // The canvas covers the whole hero, behind the text, so the card can swing and flip without
@@ -327,7 +486,7 @@ async function start() {
     const tan = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     const dist = Math.max(105 / 2 / tan, 60 / 2 / tan / (r.width / r.height));
     // widen the view to the whole stage at the same scale, then shift it so the card lands on its spot
-    const worldPerPx = (2 * dist * tan) / r.height;
+    worldPerPx = (2 * dist * tan) / r.height;
     camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan((worldPerPx * s.height) / 2 / dist));
     camera.aspect = s.width / s.height;
     const cx = r.left + r.width / 2 - s.left, cy = r.top + r.height / 2 - s.top;
@@ -335,6 +494,15 @@ async function start() {
     camera.position.set(0, -2, dist);
     camera.lookAt(0, -2, 0);
     camera.updateProjectionMatrix();
+    camera.updateMatrixWorld();
+    // fix the lanyard just above the top of the stage, straight above the card
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(new THREE.Vector2((cx / s.width) * 2 - 1, -((-30) / s.height) * 2 + 1), camera);
+    const hit = new THREE.Vector3();
+    if (ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit)) {
+      anchor.set(0, Math.max(HANG + 40, hit.y), 0);
+      buildRope();
+    }
   }
   const ro = new ResizeObserver(resize);
   ro.observe(stage);
@@ -345,8 +513,10 @@ async function start() {
   let visible = true;
   new IntersectionObserver((entries) => { visible = entries[0].isIntersecting; }).observe(stage);
 
-  let frame = 0, frameStart = performance.now();
+  let frame = 0, frameStart = performance.now(), lastNow = performance.now();
   renderer.setAnimationLoop((now) => {
+    const dt = (now - lastNow) / 1000;
+    lastNow = now;
     if (!visible) return;
 
     // portrait animation
@@ -359,22 +529,8 @@ async function start() {
       paintFront(portrait);
     }
 
-    // idle sway when nobody is moving anything
-    if (!reduce && now - lastInput > 2500) {
-      const t = now / 1000;
-      target.y = Math.sin(t * 0.6) * 0.35;
-      target.x = Math.sin(t * 0.9) * 0.06;
-      target.z = Math.sin(t * 0.75) * 0.04;
-    }
-
-    // springs
-    const tgt = { x: target.x, y: target.y + flip, z: target.z };
-    for (const k of ["x", "y", "z"]) {
-      vel[k] += (tgt[k] - cur[k]) * 0.035;
-      vel[k] *= 0.88;
-      cur[k] += vel[k];
-    }
-    pivot.rotation.set(cur.x, cur.y, cur.z);
+    simulate(dt);
+    placeCard();
     renderer.render(scene, camera);
   });
 }
