@@ -7,7 +7,6 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 const host = document.getElementById("id-card");
 const portrait = host && host.querySelector("img");
-const hint = document.getElementById("id-card-hint");
 
 if (host && portrait && hasWebGL()) start().catch((err) => console.warn("ID card unavailable, keeping the gif", err));
 
@@ -36,14 +35,18 @@ async function gifFrames(src) {
 
 // ---------- card faces ----------
 const CW = 1080, CH = 1712; // 54 x 85.6 mm
-const INK = "#111111", PAPER = "#f4f3ef", DIM = "#6b6b6b";
+const INK = "#111111";
+const PAPER = "#f4f3ef";
+const DIM = "#262626";
+const FAINT = "#9a9a9a";
+const PHOTO_BG = "#ffffff";
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = "system-ui, -apple-system, 'Segoe UI', sans-serif";
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
 function field(g, x, y, label, value, size = 40, font = SANS) {
   g.fillStyle = DIM;
-  g.font = `500 24px ${MONO}`;
+  g.font = `700 26px ${MONO}`;
   g.fillText(label, x, y);
   g.fillStyle = INK;
   g.font = `600 ${size}px ${font}`;
@@ -75,13 +78,13 @@ function drawFront(g, photo) {
   g.font = `500 26px ${MONO}`;
   g.textAlign = "right";
   g.fillText("ACCESS PASS", CW - 70, 196);
-  g.fillStyle = "#9a9a9a";
+  g.fillStyle = FAINT;
   g.fillText("EST. 2005", CW - 70, 232);
   g.textAlign = "left";
 
   // photo
   const px = 70, py = 330, pw = 450, ph = 505;
-  g.fillStyle = "#ffffff";
+  g.fillStyle = PHOTO_BG;
   g.fillRect(px, py, pw, ph);
   if (photo) {
     g.imageSmoothingEnabled = false;
@@ -103,7 +106,7 @@ function drawFront(g, photo) {
   g.font = `400 104px ${SERIF}`;
   g.fillText("Nakul Rejeesh", 70, 990);
   g.fillStyle = DIM;
-  g.font = `400 40px ${SANS}`;
+  g.font = `500 42px ${SANS}`;
   g.fillText("Computer Engineering @ UNSW", 72, 1056);
 
   g.fillStyle = INK;
@@ -171,7 +174,7 @@ async function start() {
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.NeutralToneMapping;
   const scene = new THREE.Scene();
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
   const key = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -190,24 +193,36 @@ async function start() {
   }
   const front = Object.assign(document.createElement("canvas"), { width: CW, height: CH });
   const back = Object.assign(document.createElement("canvas"), { width: CW, height: CH });
-  const fg = front.getContext("2d");
+  const fg = front.getContext("2d"), bg = back.getContext("2d");
   await document.fonts.ready;
-  drawFront(fg, frames ? frames[0].bmp : portrait);
-  drawBack(back.getContext("2d"));
   const frontTex = faceTexture(front), backTex = faceTexture(back);
+  let lastPhoto = frames ? frames[0].bmp : portrait;
+  function paintFront(photo) {
+    lastPhoto = photo;
+    drawFront(fg, photo);
+    frontTex.needsUpdate = true;
+  }
+  paintFront(lastPhoto);
+  drawBack(bg);
+  backTex.needsUpdate = true;
 
   const model = gltf.scene;
+  let edge = null;
   model.traverse((o) => {
     if (!o.isMesh) return;
     if (o.name === "card_front" || o.name === "card_back") {
       o.material = new THREE.MeshPhysicalMaterial({
         map: o.name === "card_front" ? frontTex : backTex,
-        roughness: 0.5,
+        roughness: 0.6,
+        envMapIntensity: 0.55,
         clearcoat: 1,
         clearcoatRoughness: 0.12,
       });
     }
+    if (o.name === "card_edge") edge = o;
   });
+  edge && (edge.material = edge.material.clone());
+  if (edge) edge.material.color.set(0xe6e6e0);
 
   // hang the card from the top of the lanyard connector so it swings like a real badge
   const PIVOT = 56.6;
@@ -245,15 +260,9 @@ async function start() {
     lastInput = performance.now();
   }
   const needsPermission = typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
-  const touch = matchMedia("(pointer: coarse)").matches;
   if (!needsPermission) window.addEventListener("deviceorientation", onTilt);
   let askedTilt = !needsPermission;
 
-  if (hint) {
-    hint.textContent = touch
-      ? (needsPermission ? "tap the card to turn on tilt" : "drag or tilt · tap to flip")
-      : "move your mouse · drag to spin · click to flip";
-  }
 
   // drag the card around with a finger (or the mouse): it spins freely, then settles on whichever face is nearer
   host.addEventListener("pointerdown", (e) => {
@@ -290,7 +299,6 @@ async function start() {
       try {
         if ((await DeviceOrientationEvent.requestPermission()) === "granted") {
           window.addEventListener("deviceorientation", onTilt);
-          if (hint) hint.textContent = "drag or tilt · tap to flip";
           return;
         }
       } catch { /* fall through to a flip */ }
@@ -315,9 +323,9 @@ async function start() {
     const s = stage.getBoundingClientRect(), r = host.getBoundingClientRect();
     if (!s.width || !r.width) return;
     renderer.setSize(s.width, s.height, false);
-    // distance that fits the card (about 84 x 118 units incl. clip) into its spot
+    // distance that fits the card (about 60 x 105 units incl. clip) into its spot; it can swing past the spot freely
     const tan = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
-    const dist = Math.max(118 / 2 / tan, 84 / 2 / tan / (r.width / r.height));
+    const dist = Math.max(105 / 2 / tan, 60 / 2 / tan / (r.width / r.height));
     // widen the view to the whole stage at the same scale, then shift it so the card lands on its spot
     const worldPerPx = (2 * dist * tan) / r.height;
     camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan((worldPerPx * s.height) / 2 / dist));
@@ -345,12 +353,10 @@ async function start() {
     if (frames && frames.length > 1 && now - frameStart >= frames[frame].ms) {
       frame = (frame + 1) % frames.length;
       frameStart = now;
-      drawFront(fg, frames[frame].bmp);
-      frontTex.needsUpdate = true;
+      paintFront(frames[frame].bmp);
     } else if (!frames && now - frameStart > 80) {
       frameStart = now;
-      drawFront(fg, portrait);
-      frontTex.needsUpdate = true;
+      paintFront(portrait);
     }
 
     // idle sway when nobody is moving anything

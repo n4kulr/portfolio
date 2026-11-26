@@ -68,7 +68,7 @@
         if (m !== last && (w > 0 || pad === 0)) {
           var s = document.createElement("span");
           s.textContent = MONTHS[m].toLowerCase();
-          s.style.gridColumn = (w + 1) + " / span 3";
+          s.style.gridColumn = String(w + 1);
           s.style.gridRow = "1";
           months.appendChild(s);
         }
@@ -78,7 +78,7 @@
       var n = data.total && (data.total.lastYear != null ? data.total.lastYear : null);
       if (n == null) n = days.reduce(function (a, d) { return a + d.count; }, 0);
       total.textContent = n.toLocaleString() + " contributions in the last year";
-      scroller.scrollLeft = scroller.scrollWidth;
+      if (scroller.scrollWidth > scroller.clientWidth + 4) scroller.scrollLeft = scroller.scrollWidth;
     })
     .catch(function () {
       total.textContent = "couldn't load contributions right now";

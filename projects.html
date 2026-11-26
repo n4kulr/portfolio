@@ -5,21 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Projects - Nakul Rejeesh</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="theme.js"></script>
 </head>
 <body>
   <nav>
     <div class="nav-brand">
       <span class="nav-name">nakul</span>
-      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode" title="Dark mode">
-        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 14.3A9 9 0 1 1 9.7 3a7 7 0 0 0 11.3 11.3z"/>
-        </svg>
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-        </svg>
-      </button>
     </div>
     <ul>
       <li><a href="index.html">home</a></li>
@@ -29,7 +19,13 @@
 
   <main class="projects">
     <h2>projects</h2>
-    <p class="projects-sub">click a project for what i built</p>
+    <p class="projects-sub">pick a CD for what i built</p>
+
+
+    <section class="shelf" aria-label="Projects">
+      <div class="shelf-row" id="shelf-row" role="tablist" aria-label="Pick a CD"></div>
+      <article class="cd-detail" id="cd-detail" role="tabpanel" aria-live="polite"></article>
+    </section>
 
     <section class="contrib" id="contrib" data-user="n4kulr" aria-label="GitHub contributions">
       <div class="contrib-head">
@@ -47,256 +43,9 @@
         <span class="contrib-legend" aria-hidden="true">less <i data-level="0"></i><i data-level="1"></i><i data-level="2"></i><i data-level="3"></i><i data-level="4"></i> more</span>
       </div>
     </section>
-    <a class="game-feature" href="https://guessify.uk" target="_blank" rel="noopener">
-      <div class="game-feature-info">
-        <span class="game-name">Guessify</span>
-        <p>Hear a few seconds of a song, name it before the timer runs out. Play solo, in a party room, or online against other people.</p>
-        <span class="game-feature-link">guessify.uk →</span>
-      </div>
-      <div class="game-feature-media">
-        <img src="images/guessify-demo.png" alt="Guessify gameplay preview" />
-      </div>
-    </a>
-
-    <a class="game-feature" href="https://drawmethis.vercel.app/" target="_blank" rel="noopener">
-      <div class="game-feature-info">
-        <span class="game-name">drawmethis</span>
-        <p>Sketch something in the browser, hit send, and it drops straight into a Discord channel.</p>
-        <span class="game-feature-link">drawmethis.vercel.app →</span>
-      </div>
-      <div class="game-feature-media">
-        <img src="images/drawmethis-demo.jpg" alt="drawmethis drawing page" />
-      </div>
-    </a>
-
-    <a class="game-feature" href="https://outliner-vert.vercel.app" target="_blank" rel="noopener">
-      <div class="game-feature-info">
-        <span class="game-name">Outliner</span>
-        <p>Drop in your UNSW course outlines and every assessment lands on one calendar, with week numbers worked out and an export to Google, Apple or Outlook.</p>
-        <span class="game-feature-link">outliner-vert.vercel.app →</span>
-      </div>
-      <div class="game-feature-media">
-        <img src="images/outliner-demo.jpg" alt="Outliner month calendar with the course outline drop panel" />
-      </div>
-    </a>
-
-    <a class="game-feature" href="https://hitthatbeat.vercel.app" target="_blank" rel="noopener">
-      <div class="game-feature-info">
-        <span class="game-name">hitthatbeat</span>
-        <p>Drop in any song and play it as a four-lane rhythm game, with charts from easy to expert built straight from the audio.</p>
-        <span class="game-feature-link">hitthatbeat.vercel.app →</span>
-      </div>
-      <div class="game-feature-media">
-        <img src="images/hitthatbeat-demo.jpg" alt="hitthatbeat home screen with the four note lanes" />
-      </div>
-    </a>
-
-    <a class="game-feature" href="https://linkedout-iota.vercel.app/" target="_blank" rel="noopener">
-      <div class="game-feature-info">
-        <span class="game-name">LinkedOut</span>
-        <p>The opposite of LinkedIn — a social network for failures and rejections. Winner, UNSW Terrible Ideas Hackathon 2025.</p>
-        <span class="game-feature-link">linkedout-iota.vercel.app →</span>
-      </div>
-      <div class="game-feature-media">
-        <img src="images/linkedout-demo.jpg" alt="LinkedOut feed of failure posts" />
-      </div>
-    </a>
-
-    <a class="game-feature" href="https://manjumedia.vercel.app" target="_blank" rel="noopener">
-      <div class="game-feature-info">
-        <span class="game-name">fotos</span>
-        <p>A private photo and video gallery that installs like an app, hidden behind a passcode lock screen.</p>
-        <span class="game-feature-link">manjumedia.vercel.app →</span>
-      </div>
-      <div class="game-feature-media">
-        <img src="images/fotos-demo.jpg" alt="fotos album grid" />
-      </div>
-    </a>
-
-    <div class="project-grid">
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/nucleo.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">Secure Gate</span>
-              <span class="project-year">2026</span>
-            </div>
-            <p class="project-desc">[DESN2000] An access-control system on an STM32 Nucleo-F303RE — scan a card or type a code to open the gate, with an LCD, keypad, LEDs and a buzzer handling the feedback.</p>
-            <div class="project-tags">
-              <span>C</span><span>STM32</span><span>ARM</span><span>SPI</span><span>I2C</span><span>UART</span><span>GPIO</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Written mostly in C on the F303RE's 72 MHz Cortex-M4, with about 10% hand-written in ARM assembly</li>
-            <li>My part of the build: the PN532 RFID/NFC reader, a shift-register LED bank, the buzzer and the switches</li>
-            <li>Got the card reader working by forking an existing PN532 driver and reading up on it enough to adapt it</li>
-            <li>Keypad and LCD for entering codes and showing status, wired up over GPIO, interrupts, timers, UART, SPI and I2C</li>
-          </ul>
-        </div>
-        <div class="project-footer"></div>
-      </div>
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/itsquiz.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">Toohak</span>
-              <span class="project-year">2025</span>
-            </div>
-            <p class="project-desc">[COMP1531] A full-stack quiz app in the shape of Kahoot — build a quiz, host a session, players join and answer.</p>
-            <div class="project-tags">
-              <span>TypeScript</span><span>JavaScript</span><span>GitLab</span><span>REST API</span><span>Full Stack</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Built as a team in TypeScript and JavaScript, tracked on GitLab</li>
-            <li>A REST API for creating quizzes, hosting sessions and scoring answers</li>
-            <li>Login and persistent storage so quizzes and results stick around</li>
-            <li>Worked in iterations with code review and tests, the way COMP1531 runs</li>
-          </ul>
-        </div>
-        <div class="project-footer"></div>
-      </div>
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/gitavadi.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">Gitavadi</span>
-              <span class="project-year">2025</span>
-            </div>
-            <p class="project-desc">A native iOS reader for the Bhagavad Gita — move through all 18 chapters and 700 verses.</p>
-            <div class="project-tags">
-              <span>Swift</span><span>SwiftUI</span><span>iOS</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Swift and SwiftUI — my first native mobile app</li>
-            <li>A clean reader for all 18 chapters and 700 verses, chapter by chapter</li>
-            <li>Built the interface using SwiftUI's declarative UI framework</li>
-          </ul>
-        </div>
-        <div class="project-footer"></div>
-      </div>
-
-      <div class="project-card-wrap">
-        <button type="button" class="project-card" aria-haspopup="dialog">
-          <div class="project-thumb">
-            <img src="images/fire-rescue.svg" alt="" />
-          </div>
-          <div class="project-body">
-            <div class="project-top">
-              <span class="project-name">Fire Rescue Robot</span>
-              <span class="project-year">2024</span>
-            </div>
-            <p class="project-desc">[DESN1000] A first-year Arduino robot that homes in on a target with light sensors and picks it up with a servo arm.</p>
-            <div class="project-tags">
-              <span>Arduino</span><span>C</span><span>Sensors</span><span>Servo Motors</span>
-            </div>
-          </div>
-        </button>
-        <div class="project-learn" hidden>
-          <ul>
-            <li>Arduino and C, one of my first hardware builds</li>
-            <li>Light sensors to find the target, servos to drive and to work the arm</li>
-            <li>Team effort on the wiring, the mechanical design, and getting the pickup to actually grab</li>
-          </ul>
-        </div>
-        <div class="project-footer"></div>
-      </div>
-
-    </div>
   </main>
 
-  <dialog class="project-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
-    <form method="dialog">
-      <button type="submit" class="project-dialog-close" aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18"/>
-        </svg>
-      </button>
-    </form>
-    <p class="project-dialog-kicker">what i built</p>
-    <h3 id="project-dialog-title"></h3>
-    <div class="project-tags" id="project-dialog-tags"></div>
-    <div class="project-dialog-body" id="project-dialog-body"></div>
-  </dialog>
-
-  <script>
-    (function () {
-      var dialog = document.getElementById("project-dialog");
-      var title = document.getElementById("project-dialog-title");
-      var tags = document.getElementById("project-dialog-tags");
-      var body = document.getElementById("project-dialog-body");
-      var scrollX = 0;
-      var scrollY = 0;
-      var pushed = false;
-      var fromPop = false;
-
-      function restoreScroll() {
-        window.scrollTo(scrollX, scrollY);
-      }
-
-      function openFrom(wrap) {
-        var card = wrap.querySelector(".project-card");
-        title.textContent = card.querySelector(".project-name").textContent;
-        tags.innerHTML = card.querySelector(".project-tags").innerHTML;
-        body.innerHTML = wrap.querySelector(".project-learn").innerHTML;
-        scrollX = window.scrollX;
-        scrollY = window.scrollY;
-        dialog.showModal();
-        restoreScroll();
-        requestAnimationFrame(restoreScroll);
-        history.pushState({ learnt: 1 }, "");
-        pushed = true;
-      }
-
-      document.querySelectorAll(".project-card-wrap").forEach(function (wrap) {
-        wrap.addEventListener("click", function (e) {
-          if (e.target.closest(".project-live")) return;
-          openFrom(wrap);
-        });
-      });
-
-      dialog.addEventListener("close", function () {
-        restoreScroll();
-        requestAnimationFrame(restoreScroll);
-        if (pushed && !fromPop) history.back();
-        pushed = false;
-        fromPop = false;
-      });
-
-      window.addEventListener("popstate", function () {
-        if (dialog.open) {
-          fromPop = true;
-          dialog.close();
-        }
-      });
-
-      dialog.addEventListener("click", function (e) {
-        var r = dialog.getBoundingClientRect();
-        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
-          dialog.close();
-        }
-      });
-    })();
-  </script>
   <script src="contrib.js"></script>
+  <script src="shelf.js"></script>
 </body>
 </html>
